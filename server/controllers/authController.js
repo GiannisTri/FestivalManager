@@ -27,11 +27,16 @@ const login = async (req, res) => {
 
     const user = result.rows[0];
 
+    console.log("Username:", username);
+    console.log("Password entered:", password);
+    console.log("Hash from DB:", user.password_hash);
+
     // Έλεγχος κωδικού
     const validPassword = await bcrypt.compare(
       password,
       user.password_hash
     );
+    console.log("Password valid:", validPassword);
 
     if (!validPassword) {
       return res.status(401).json({
