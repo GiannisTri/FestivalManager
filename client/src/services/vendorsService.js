@@ -16,18 +16,18 @@ const mapVendorToBackend = (vendor) => ({
 });
 
 const getAllVendors = async () => {
-  const response = await api.get("/vendors");
+  const response = await api.get("/api/vendors");
   return response.data.map(mapVendorToFrontend);
 };
 
 const getVendorById = async (id) => {
-  const response = await api.get(`/vendors/${id}`);
+  const response = await api.get(`/api/vendors/${id}`);
   return mapVendorToFrontend(response.data);
 };
 
 const createVendor = async (vendor) => {
   const response = await api.post(
-    "/vendors",
+    "/api/vendors",
     mapVendorToBackend(vendor)
   );
 
@@ -36,7 +36,7 @@ const createVendor = async (vendor) => {
 
 const updateVendor = async (id, vendor) => {
   const response = await api.put(
-    `/vendors/${id}`,
+    `/api/vendors/${id}`,
     mapVendorToBackend(vendor)
   );
 
@@ -44,7 +44,7 @@ const updateVendor = async (id, vendor) => {
 };
 
 const deleteVendor = async (id) => {
-  const response = await api.delete(`/vendors/${id}`);
+  const response = await api.delete(`/api/vendors/${id}`);
   return response.data;
 };
 

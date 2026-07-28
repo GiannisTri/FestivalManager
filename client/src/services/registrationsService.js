@@ -9,17 +9,17 @@ const mapRegistration = (registration) => ({
 });
 
 const getAllRegistrations = async () => {
-  const response = await api.get("/registrations");
+  const response = await api.get("/api/registrations");
   return response.data.map(mapRegistration);
 };
 
 const getRegistrationById = async (id) => {
-  const response = await api.get(`/registrations/${id}`);
+  const response = await api.get(`/api/registrations/${id}`);
   return mapRegistration(response.data);
 };
 
 const createRegistration = async (registration) => {
-  const response = await api.post("/registrations", {
+  const response = await api.post("/api/registrations", {
     vendor_id: registration.vendorId,
     year: registration.year,
   });
@@ -28,7 +28,7 @@ const createRegistration = async (registration) => {
 };
 
 const updateRegistration = async (id, registration) => {
-  const response = await api.put(`/registrations/${id}`, {
+  const response = await api.put(`/api/registrations/${id}`, {
     vendor_id: registration.vendorId,
     year: registration.year,
   });
@@ -37,7 +37,7 @@ const updateRegistration = async (id, registration) => {
 };
 
 const deleteRegistration = async (id) => {
-  const response = await api.delete(`/registrations/${id}`);
+  const response = await api.delete(`/api/registrations/${id}`);
   return response.data;
 };
 

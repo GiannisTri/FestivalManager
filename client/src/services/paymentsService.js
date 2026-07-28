@@ -14,17 +14,17 @@ const mapPayment = (payment) => ({
 });
 
 const getAllPayments = async () => {
-  const response = await api.get("/payments");
+  const response = await api.get("/api/payments");
   return response.data.map(mapPayment);
 };
 
 const getPaymentById = async (id) => {
-  const response = await api.get(`/payments/${id}`);
+  const response = await api.get(`/api/payments/${id}`);
   return mapPayment(response.data);
 };
 
 const createPayment = async (payment) => {
-  const response = await api.post("/payments", {
+  const response = await api.post("/api/payments", {
     registration_id: payment.registrationId,
     festival_id: payment.festivalId,
     position: payment.position,
@@ -36,7 +36,7 @@ const createPayment = async (payment) => {
 };
 
 const updatePayment = async (id, payment) => {
-  const response = await api.put(`/payments/${id}`, {
+  const response = await api.put(`/api/payments/${id}`, {
     registration_id: payment.registrationId,
     festival_id: payment.festivalId,
     position: payment.position,
@@ -48,7 +48,7 @@ const updatePayment = async (id, payment) => {
 };
 
 const deletePayment = async (id) => {
-  const response = await api.delete(`/payments/${id}`);
+  const response = await api.delete(`/api/payments/${id}`);
   return response.data;
 };
 

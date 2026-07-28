@@ -15,13 +15,13 @@ const mapFestival = (festival) => ({
 });
 
 const getAllFestivals = async () => {
-  const response = await api.get("/festivals");
+  const response = await api.get("/api/festivals");
 
   return response.data.map(mapFestival);
 };
 
 const getFestivalById = async (id) => {
-  const response = await api.get(`/festivals/${id}`);
+  const response = await api.get(`/api/festivals/${id}`);
 
   return mapFestival(response.data);
 };
