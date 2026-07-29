@@ -21,11 +21,16 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Logout αν το token έχει λήξει
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const token = localStorage.getItem("token");
+
+    if (
+      error.response?.status === 401 &&
+      token &&
+      !error.config.url.includes("/api/auth/login")
+    ) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
 
