@@ -12,7 +12,7 @@ function Footer() {
 
         <span className="footer-separator">•</span>
 
-        <span>Version 1.0.0</span>
+        <span>Version 1.0.1</span>
 
         <span className="footer-separator">•</span>
 
