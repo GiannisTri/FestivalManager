@@ -228,7 +228,7 @@ const matchesYear =
             return (
               <tr key={vendor.id}>
                 <td>
-                  {vendor.firstName} {vendor.lastName}
+                  {vendor.lastName} {vendor.firstName}
                 </td>
 
                 <td>{vendor.phone}</td>
