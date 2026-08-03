@@ -105,14 +105,29 @@ console.log("Festivals:", festivals);
 
       
 
-    const matchesSearch =
-      fullName.includes(search.toLowerCase()) ||
-      vendor.phone.includes(search) ||
-      vendor.email.toLowerCase().includes(search.toLowerCase());
-
-const vendorRegistrations = registrations.filter(
+ const vendorRegistrations = registrations.filter(
   (registration) => registration.vendorId === vendor.id
 );
+
+const registrationIds = vendorRegistrations.map(
+  (registration) => registration.id
+);
+
+const currentPayment = currentFestival
+  ? payments.find(
+      (payment) =>
+        registrationIds.includes(payment.registrationId) &&
+        payment.festivalId === currentFestival.id
+    )
+  : null;
+
+const matchesSearch =
+  fullName.includes(search.toLowerCase()) ||
+  vendor.phone.includes(search) ||
+  vendor.email.toLowerCase().includes(search.toLowerCase()) ||
+  currentPayment?.position
+    ?.toLowerCase()
+    .includes(search.toLowerCase());
 
 const matchesYear =
   year === "Όλα" ||
