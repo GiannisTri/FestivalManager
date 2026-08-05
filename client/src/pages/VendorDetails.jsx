@@ -64,6 +64,30 @@ function VendorDetails() {
         <p>📞 {vendor.phone}</p>
 
         <p>✉ {vendor.email}</p>
+        <p>🪪 ΑΦΜ: {vendor.afm || "-"}</p>
+
+{vendor.notes && (
+  <div
+    style={{
+      marginTop: "20px",
+      padding: "15px",
+      border: "1px solid #ddd",
+      borderRadius: "8px",
+      background: "#f8f8f8",
+    }}
+  >
+    <strong>📝 Παρατηρήσεις</strong>
+
+    <p
+      style={{
+        marginTop: "10px",
+        whiteSpace: "pre-wrap",
+      }}
+    >
+      {vendor.notes}
+    </p>
+  </div>
+)}
       </div>
 
       {years.map((year) => {
