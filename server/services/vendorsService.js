@@ -77,7 +77,7 @@ const updateVendor = async (id, vendor) => {
       first_name = $1,
       last_name = $2,
       phone = $3,
-      email = $4
+      email = $4,
       afm = $5,
       notes = $6
     WHERE id = $7
