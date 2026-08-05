@@ -6,6 +6,8 @@ const emptyVendor = {
   lastName: "",
   phone: "",
   email: "",
+  afm: "",
+  notes: "",
 };
 
 const createEmptyFestivalState = (festivals) => {
@@ -40,6 +42,8 @@ function VendorModal({
       lastName: vendor.lastName,
       phone: vendor.phone,
       email: vendor.email,
+      afm: vendor.afm || "",
+      notes: vendor.notes || "",
     };
   };
 
@@ -189,6 +193,8 @@ onSave({
       lastName: form.lastName,
       phone: form.phone,
       email: form.email,
+      afm: form.afm,
+      notes: form.notes,
   },
 
   year: Number(year),
@@ -266,6 +272,22 @@ onSave({
             value={form.email}
             onChange={handleChange}
           />
+          <input
+             type="text"
+             name="afm"
+             placeholder="ΑΦΜ"
+             value={form.afm}
+             onChange={handleChange}
+             maxLength={9}
+          />
+
+      <textarea
+        name="notes"
+        placeholder="Παρατηρήσεις"
+        value={form.notes}
+        onChange={handleChange}
+        rows={4}
+      />
 
           <label>Έτος</label>
 
