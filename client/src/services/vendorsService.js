@@ -6,6 +6,8 @@ const mapVendorToFrontend = (vendor) => ({
   lastName: vendor.last_name,
   phone: vendor.phone,
   email: vendor.email,
+  afm: vendor.afm,
+  notes: vendor.notes,
 });
 
 const mapVendorToBackend = (vendor) => ({
@@ -13,6 +15,8 @@ const mapVendorToBackend = (vendor) => ({
   last_name: vendor.lastName,
   phone: vendor.phone,
   email: vendor.email,
+  afm: vendor.afm,
+  notes: vendor.notes,
 });
 
 const getAllVendors = async () => {
