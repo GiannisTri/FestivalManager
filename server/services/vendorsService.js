@@ -29,6 +29,8 @@ const createVendor = async (vendor) => {
     last_name,
     phone,
     email,
+    afm,
+    notes,
   } = vendor;
 
   const result = await pool.query(
@@ -38,9 +40,11 @@ const createVendor = async (vendor) => {
       first_name,
       last_name,
       phone,
-      email
+      email,
+      afm,
+      notes
     )
-    VALUES ($1, $2, $3, $4)
+    VALUES ($1, $2, $3, $4, $5, $6)
     RETURNING *
     `,
     [
@@ -48,6 +52,8 @@ const createVendor = async (vendor) => {
       last_name,
       phone,
       email,
+      afm,
+      notes,
     ]
   );
 
@@ -60,6 +66,8 @@ const updateVendor = async (id, vendor) => {
     last_name,
     phone,
     email,
+    afm,
+    notes,
   } = vendor;
 
   const result = await pool.query(
@@ -70,7 +78,9 @@ const updateVendor = async (id, vendor) => {
       last_name = $2,
       phone = $3,
       email = $4
-    WHERE id = $5
+      afm = $5,
+      notes = $6
+    WHERE id = $7
     RETURNING *
     `,
     [
@@ -78,6 +88,8 @@ const updateVendor = async (id, vendor) => {
       last_name,
       phone,
       email,
+      afm,
+      notes,
       id,
     ]
   );
