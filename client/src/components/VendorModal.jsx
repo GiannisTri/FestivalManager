@@ -281,13 +281,16 @@ onSave({
              maxLength={9}
           />
 
-      <textarea
-        name="notes"
-        placeholder="Παρατηρήσεις"
-        value={form.notes}
-        onChange={handleChange}
-        rows={4}
-      />
+      <label>Παρατηρήσεις</label>
+
+<textarea
+  name="notes"
+  placeholder="Γράψτε τυχόν παρατηρήσεις..."
+  value={form.notes}
+  onChange={handleChange}
+  rows={5}
+  maxLength={1000}
+/>
 
           <label>Έτος</label>
 
