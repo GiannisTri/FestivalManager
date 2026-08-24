@@ -359,6 +359,7 @@ const matchesYear =
           position: festival.position,
           meters: festival.meters,
           amount: festival.amount,
+          taxes: festival.taxes,
         }
       );
 
@@ -370,6 +371,7 @@ const matchesYear =
         position: festival.position,
         meters: festival.meters,
         amount: festival.amount,
+        taxes: festival.taxes,
       });
 
     }
@@ -408,6 +410,7 @@ const matchesYear =
           position: festival.position,
           meters: festival.meters,
           amount: festival.amount,
+          taxes: festival.taxes,
         });
 
       }
