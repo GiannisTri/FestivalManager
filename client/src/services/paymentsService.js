@@ -10,6 +10,7 @@ const mapPayment = (payment) => ({
   position: payment.position,
   meters: payment.meters,
   amount: payment.amount,
+  taxes: payment.taxes,
   createdAt: payment.created_at,
 });
 
@@ -30,6 +31,7 @@ const createPayment = async (payment) => {
     position: payment.position,
     meters: payment.meters,
     amount: payment.amount,
+    taxes: payment.taxes,
   });
 
   return mapPayment(response.data);
@@ -42,6 +44,7 @@ const updatePayment = async (id, payment) => {
     position: payment.position,
     meters: payment.meters,
     amount: payment.amount,
+    taxes: payment.taxes,
   });
 
   return mapPayment(response.data);
