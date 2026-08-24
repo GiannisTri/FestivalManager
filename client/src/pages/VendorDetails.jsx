@@ -121,14 +121,15 @@ function VendorDetails() {
                   <th>Πανηγύρι</th>
                   <th>Θέση</th>
                   <th>Μέτρα</th>
-                  <th>Ποσό</th>
+                  <th>Σύνολο</th>
+                  <th>Υπόλοιπο</th>
                 </tr>
               </thead>
 
               <tbody>
                 {currentPayments.length === 0 ? (
                   <tr>
-                    <td colSpan="4">
+                    <td colSpan="5">
                       Δεν υπάρχουν συμμετοχές.
                     </td>
                   </tr>
@@ -144,6 +145,7 @@ function VendorDetails() {
                         <td>{payment.position || "-"}</td>
                         <td>{payment.meters || "-"}</td>
                         <td>{payment.amount}€</td>
+                        <td>{payment.taxes ?? 0}€</td>
                       </tr>
                     );
                   })
