@@ -18,6 +18,7 @@ const createEmptyFestivalState = (festivals) => {
       checked: false,
       paymentId: null,
       amount: "",
+      taxes: "",
       position: "",
       meters: "",
     };
@@ -81,6 +82,7 @@ function VendorModal({
       checked: true,
       paymentId: payment.id,
       amount: payment.amount.toString(),
+      taxes: payment.taxes?.toString() || "",
       position: payment.position || "",
       meters: payment.meters?.toString() || "",
     };
@@ -142,6 +144,16 @@ function VendorModal({
     }));
   }
 
+  function handleFestivalTaxes(id, value) {
+  setFestivalData((prev) => ({
+    ...prev,
+    [id]: {
+      ...prev[id],
+      taxes: value,
+    },
+  }));
+}
+
   function handleFestivalPosition(id, value) {
   setFestivalData((prev) => ({
     ...prev,
@@ -176,6 +188,10 @@ function handleFestivalMeters(id, value) {
 
   amount: Number(
     festivalData[festival.id].amount
+  ),
+
+  taxes: Number(
+  festivalData[festival.id].taxes
   ),
 
   position:
@@ -368,7 +384,7 @@ onSave({
     </div>
 
     <div className="festival-field">
-      <label>Ποσό (€)</label>
+      <label>Σύνολο (€)</label>
       <input
         type="number"
         value={festivalData[festival.id].amount}
@@ -380,6 +396,19 @@ onSave({
         }
       />
     </div>
+    <div className="festival-field">
+  <label>Υπόλοιπο (€)</label>
+  <input
+    type="number"
+    value={festivalData[festival.id].taxes}
+    onChange={(e) =>
+      handleFestivalTaxes(
+        festival.id,
+        e.target.value
+      )
+    }
+  />
+</div>
 
   </div>
 )}
