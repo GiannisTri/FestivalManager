@@ -12,6 +12,7 @@ const getAllPayments = async () => {
       p.position,
       p.meters,
       p.amount,
+      p.taxes,
       p.created_at
     FROM payments p
     JOIN registrations r ON p.registration_id = r.id
@@ -40,6 +41,7 @@ const getPaymentById = async (id) => {
       p.position,
       p.meters,
       p.amount,
+      p.taxes,
       p.created_at
     FROM payments p
     JOIN registrations r ON p.registration_id = r.id
@@ -86,6 +88,7 @@ const createPayment = async (payment) => {
     position,
     meters,
     amount,
+    taxes,
   } = payment;
 
   const result = await pool.query(
@@ -96,9 +99,10 @@ const createPayment = async (payment) => {
       festival_id,
       position,
       meters,
-      amount
+      amount,
+      taxes
     )
-    VALUES ($1, $2, $3, $4, $5)
+    VALUES ($1, $2, $3, $4, $5, $6)
     RETURNING *
     `,
     [
@@ -107,6 +111,7 @@ const createPayment = async (payment) => {
       position,
       meters,
       amount,
+      taxes ?? 0,
     ]
   );
 
@@ -120,6 +125,7 @@ const updatePayment = async (id, payment) => {
     position,
     meters,
     amount,
+    taxes,
   } = payment;
 
   const result = await pool.query(
@@ -130,8 +136,9 @@ const updatePayment = async (id, payment) => {
       festival_id = $2,
       position = $3,
       meters = $4,
-      amount = $5
-    WHERE id = $6
+      amount = $5,
+      taxes = $6
+    WHERE id = $7
     RETURNING *
     `,
     [
@@ -140,6 +147,7 @@ const updatePayment = async (id, payment) => {
       position,
       meters,
       amount,
+      taxes ?? 0,
       id,
     ]
   );
