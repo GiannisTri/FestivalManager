@@ -10,6 +10,8 @@ import "../css/Dashboard.css";
 function Dashboard() {
   const currentYear = new Date().getFullYear();
 
+  const [selectedYear, setSelectedYear] = useState(currentYear);
+
   const [vendors, setVendors] = useState([]);
   const [registrations, setRegistrations] = useState([]);
   const [festivals, setFestivals] = useState([]);
@@ -42,15 +44,17 @@ function Dashboard() {
     loadData();
   }, []);
 
-  // Registrations μόνο του τρέχοντος έτους
-  const registrationsForYear = registrations.filter(
-    (registration) => registration.year === currentYear
+  // Registrations του επιλεγμένου έτους
+  const registrationsForSelectedYear = registrations.filter(
+    (registration) =>
+      registration.year === Number(selectedYear)
   );
 
-  // IDs των registrations του τρέχοντος έτους
-  const registrationIdsForYear = registrationsForYear.map(
-    (registration) => registration.id
-  );
+  // IDs των registrations του επιλεγμένου έτους
+  const registrationIdsForSelectedYear =
+    registrationsForSelectedYear.map(
+      (registration) => registration.id
+    );
 
   const today = new Date().toISOString().split("T")[0];
 
@@ -71,9 +75,28 @@ function Dashboard() {
     ? payments.filter(
         (payment) =>
           payment.festivalId === activeFestival.id &&
-          registrationIdsForYear.includes(payment.registrationId)
+          registrationIdsForSelectedYear.includes(
+            payment.registrationId
+          )
       ).length
     : 0;
+
+  // Συνολικό amount ανά πανηγύρι
+  const getFestivalTotal = (festivalId) => {
+    return payments
+      .filter(
+        (payment) =>
+          payment.festivalId === festivalId &&
+          registrationIdsForSelectedYear.includes(
+            payment.registrationId
+          )
+      )
+      .reduce(
+        (sum, payment) =>
+          sum + Number(payment.amount || 0),
+        0
+      );
+  };
 
   return (
     <div className="dashboard">
@@ -90,8 +113,8 @@ function Dashboard() {
 
         <div className="stat-card">
           <div className="icon">📝</div>
-          <h2>{registrationsForYear.length}</h2>
-          <p>Εγγραφές {currentYear}</p>
+          <h2>{registrationsForSelectedYear.length}</h2>
+          <p>Εγγραφές {selectedYear}</p>
         </div>
 
         <div className="stat-card">
@@ -101,6 +124,7 @@ function Dashboard() {
         </div>
 
       </div>
+
 
       <div className="festival-grid">
 
@@ -113,11 +137,13 @@ function Dashboard() {
               <h3>{activeFestival.name}</h3>
 
               <p>
-                {activeFestival.startDate} - {activeFestival.endDate}
+                {activeFestival.startDate} -{" "}
+                {activeFestival.endDate}
               </p>
 
               <p>
-                Συμμετέχοντες: {activeFestivalParticipants}
+                Συμμετέχοντες:{" "}
+                {activeFestivalParticipants}
               </p>
 
               <span className="badge active">
@@ -126,7 +152,9 @@ function Dashboard() {
             </>
           ) : (
             <>
-              <h3>Δεν υπάρχει ενεργό πανηγύρι</h3>
+              <h3>
+                Δεν υπάρχει ενεργό πανηγύρι
+              </h3>
 
               <span className="badge inactive">
                 Εκτός περιόδου
@@ -135,6 +163,7 @@ function Dashboard() {
           )}
 
         </div>
+
 
         <div className="festival-card">
 
@@ -145,12 +174,92 @@ function Dashboard() {
               <h3>{upcomingFestival.name}</h3>
 
               <p>
-                {upcomingFestival.startDate} - {upcomingFestival.endDate}
+                {upcomingFestival.startDate} -{" "}
+                {upcomingFestival.endDate}
               </p>
             </>
           ) : (
-            <h3>Δεν υπάρχουν επόμενα πανηγύρια</h3>
+            <h3>
+              Δεν υπάρχουν επόμενα πανηγύρια
+            </h3>
           )}
+
+        </div>
+
+      </div>
+
+
+      {/* =========================================
+          ΣΥΝΟΛΑ ΠΑΝΗΓΥΡΙΩΝ
+      ========================================= */}
+
+      <div className="festival-totals-section">
+
+        <div className="festival-totals-header">
+
+          <h2>💰 Σύνολα Πανηγυριών</h2>
+
+          <div className="year-selector">
+
+            <label htmlFor="dashboard-year">
+              Έτος:
+            </label>
+
+            <select
+              id="dashboard-year"
+              value={selectedYear}
+              onChange={(e) =>
+                setSelectedYear(Number(e.target.value))
+              }
+            >
+              <option value="2025">2025</option>
+              <option value="2026">2026</option>
+              <option value="2027">2027</option>
+              <option value="2028">2028</option>
+            </select>
+
+          </div>
+
+        </div>
+
+
+        <div className="festival-totals-grid">
+
+          {festivals.map((festival) => {
+
+            const total = getFestivalTotal(
+              festival.id
+            );
+
+            return (
+              <div
+                key={festival.id}
+                className="festival-total-card"
+              >
+
+                <div className="festival-total-icon">
+                  🎪
+                </div>
+
+                <h3>
+                  {festival.name}
+                </h3>
+
+                <div className="festival-total-amount">
+                  {total.toLocaleString("el-GR", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                  €
+                </div>
+
+                <p>
+                  Συνολικό ποσό {selectedYear}
+                </p>
+
+              </div>
+            );
+          })}
 
         </div>
 
