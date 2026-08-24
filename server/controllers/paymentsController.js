@@ -42,14 +42,18 @@ const createPayment = async (req, res) => {
       position,
       meters,
       amount,
+      taxes,
     } = req.body;
+
+    console.log("PAYMENT BODY:", req.body);
 
     if (
       !registration_id ||
       !festival_id ||
       !position ||
       meters === undefined ||
-      amount === undefined
+      amount === undefined ||
+      taxes === undefined
     ) {
       return res.status(400).json({
         message: "All fields are required.",
@@ -65,6 +69,12 @@ const createPayment = async (req, res) => {
     if (Number(amount) < 0) {
       return res.status(400).json({
         message: "Amount cannot be negative.",
+      });
+    }
+
+    if (Number(taxes) < 0) {
+      return res.status(400).json({
+        message: "Taxes cannot be negative.",
       });
     }
 
@@ -108,14 +118,18 @@ const updatePayment = async (req, res) => {
       position,
       meters,
       amount,
+      taxes,
     } = req.body;
+
+    console.log("UPDATE PAYMENT BODY:", req.body);
 
     if (
       !registration_id ||
       !festival_id ||
       !position ||
       meters === undefined ||
-      amount === undefined
+      amount === undefined ||
+      taxes === undefined
     ) {
       return res.status(400).json({
         message: "All fields are required.",
@@ -158,6 +172,12 @@ const updatePayment = async (req, res) => {
     if (Number(amount) < 0) {
       return res.status(400).json({
         message: "Amount cannot be negative.",
+      });
+    }
+
+    if (Number(taxes) < 0) {
+      return res.status(400).json({
+        message: "Taxes cannot be negative.",
       });
     }
 
