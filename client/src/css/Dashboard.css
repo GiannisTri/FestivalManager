@@ -263,3 +263,50 @@
   }
 
 }
+
+/* =========================================
+   COUNTDOWN
+========================================= */
+
+.festival-countdown {
+  margin-top: 18px;
+  padding: 12px;
+  border-radius: 10px;
+  background: #f1f5f9;
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.festival-countdown span {
+  color: #64748b;
+  font-size: 14px;
+}
+
+.festival-countdown strong {
+  color: #2563eb;
+  font-size: 20px;
+  letter-spacing: 0.5px;
+}
+
+.festival-countdown.started {
+  display: block;
+  background: #dcfce7;
+  color: #15803d;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 600px) {
+
+  .festival-countdown strong {
+    font-size: 18px;
+  }
+
+}
