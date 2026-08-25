@@ -19,7 +19,10 @@ function Dashboard() {
 
   const [now, setNow] = useState(new Date());
 
+  // =========================================
   // Φόρτωση δεδομένων
+  // =========================================
+
   useEffect(() => {
     async function loadData() {
       try {
@@ -47,7 +50,10 @@ function Dashboard() {
     loadData();
   }, []);
 
-  // Live ενημέρωση countdown κάθε δευτερόλεπτο
+  // =========================================
+  // Live countdown
+  // =========================================
+
   useEffect(() => {
     const timer = setInterval(() => {
       setNow(new Date());
@@ -56,28 +62,43 @@ function Dashboard() {
     return () => clearInterval(timer);
   }, []);
 
-  // Registrations του επιλεγμένου έτους
-  const registrationsForSelectedYear = registrations.filter(
-    (registration) =>
-      registration.year === Number(selectedYear)
-  );
+  // =========================================
+  // Registrations επιλεγμένου έτους
+  // =========================================
 
-  // IDs των registrations του επιλεγμένου έτους
+  const registrationsForSelectedYear =
+    registrations.filter(
+      (registration) =>
+        registration.year === Number(selectedYear)
+    );
+
   const registrationIdsForSelectedYear =
     registrationsForSelectedYear.map(
       (registration) => registration.id
     );
 
-  const today = new Date().toISOString().split("T")[0];
+  // =========================================
+  // Ημερομηνίες
+  // =========================================
 
+  const today = new Date()
+    .toISOString()
+    .split("T")[0];
+
+  // =========================================
   // Ενεργό πανηγύρι
+  // =========================================
+
   const activeFestival = festivals.find(
     (festival) =>
       today >= festival.startDate &&
       today <= festival.endDate
   );
 
+  // =========================================
   // Επόμενο πανηγύρι
+  // =========================================
+
   const upcomingFestival = festivals
     .filter(
       (festival) =>
@@ -87,18 +108,26 @@ function Dashboard() {
       a.startDate.localeCompare(b.startDate)
     )[0];
 
+  // =========================================
   // Συμμετέχοντες ενεργού πανηγυριού
-  const activeFestivalParticipants = activeFestival
-    ? payments.filter(
-        (payment) =>
-          payment.festivalId === activeFestival.id &&
-          registrationIdsForSelectedYear.includes(
-            payment.registrationId
-          )
-      ).length
-    : 0;
+  // =========================================
 
-  // Συνολικό amount ανά πανηγύρι
+  const activeFestivalParticipants =
+    activeFestival
+      ? payments.filter(
+          (payment) =>
+            payment.festivalId ===
+              activeFestival.id &&
+            registrationIdsForSelectedYear.includes(
+              payment.registrationId
+            )
+        ).length
+      : 0;
+
+  // =========================================
+  // Συνολικό AMOUNT ανά πανηγύρι
+  // =========================================
+
   const getFestivalTotal = (festivalId) => {
     return payments
       .filter(
@@ -115,11 +144,80 @@ function Dashboard() {
       );
   };
 
-  // Countdown μέχρι την έναρξη
+  // =========================================
+  // Συνολικό TAXES ανά πανηγύρι
+  // =========================================
+
+  const getFestivalTaxes = (festivalId) => {
+    return payments
+      .filter(
+        (payment) =>
+          payment.festivalId === festivalId &&
+          registrationIdsForSelectedYear.includes(
+            payment.registrationId
+          )
+      )
+      .reduce(
+        (sum, payment) =>
+          sum + Number(payment.taxes || 0),
+        0
+      );
+  };
+
+  // =========================================
+  // Συνολικά AMOUNT
+  // =========================================
+
+  const totalAmount = festivals.reduce(
+    (sum, festival) =>
+      sum + getFestivalTotal(festival.id),
+    0
+  );
+
+  // =========================================
+  // Συνολικά ΥΠΟΛΟΙΠΑ
+  // =========================================
+
+  const totalTaxes = festivals.reduce(
+    (sum, festival) =>
+      sum + getFestivalTaxes(festival.id),
+    0
+  );
+
+  // =========================================
+  // Πωλητές με υπόλοιπο
+  // =========================================
+
+  const vendorsWithBalance = new Set(
+    payments
+      .filter(
+        (payment) =>
+          registrationIdsForSelectedYear.includes(
+            payment.registrationId
+          ) &&
+          Number(payment.taxes || 0) > 0
+      )
+      .map((payment) => {
+        const registration =
+          registrations.find(
+            (r) =>
+              r.id === payment.registrationId
+          );
+
+        return registration?.vendorId;
+      })
+      .filter(Boolean)
+  ).size;
+
+  // =========================================
+  // Countdown
+  // =========================================
+
   const getCountdown = (startDate) => {
     const start = new Date(startDate);
 
-    const difference = start.getTime() - now.getTime();
+    const difference =
+      start.getTime() - now.getTime();
 
     if (difference <= 0) {
       return null;
@@ -151,6 +249,29 @@ function Dashboard() {
       seconds,
     };
   };
+
+  // =========================================
+  // Μεγαλύτερο ποσό για το γράφημα
+  // =========================================
+
+  const festivalTotals = festivals.map(
+    (festival) => ({
+      festival,
+      total: getFestivalTotal(
+        festival.id
+      ),
+      taxes: getFestivalTaxes(
+        festival.id
+      ),
+    })
+  );
+
+  const maxFestivalTotal = Math.max(
+    ...festivalTotals.map(
+      (item) => item.total
+    ),
+    1
+  );
 
   return (
     <div className="dashboard">
@@ -369,11 +490,6 @@ function Dashboard() {
                   Συνολικό ποσό {selectedYear}
                 </p>
 
-
-                {/* =================================
-                    COUNTDOWN
-                ================================= */}
-
                 {countdown ? (
                   <div className="festival-countdown">
 
@@ -407,6 +523,244 @@ function Dashboard() {
             );
 
           })}
+
+        </div>
+
+      </div>
+
+
+      {/* =========================================
+          ΟΙΚΟΝΟΜΙΚΗ ΕΙΚΟΝΑ
+      ========================================= */}
+
+      <div className="financial-section">
+
+        <div className="financial-header">
+
+          <div>
+            <h2>
+              📊 Οικονομική Εικόνα
+            </h2>
+
+            <p>
+              Αναλυτικά στοιχεία για το {selectedYear}
+            </p>
+          </div>
+
+        </div>
+
+
+        <div className="financial-summary">
+
+          <div className="financial-summary-card income">
+
+            <div className="financial-summary-icon">
+              💰
+            </div>
+
+            <div>
+              <span>
+                Συνολικά Έσοδα
+              </span>
+
+              <strong>
+                {totalAmount.toLocaleString(
+                  "el-GR",
+                  {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }
+                )}
+                €
+              </strong>
+            </div>
+
+          </div>
+
+
+          <div className="financial-summary-card balance">
+
+            <div className="financial-summary-icon">
+              ⚠️
+            </div>
+
+            <div>
+              <span>
+                Υπόλοιπα προς είσπραξη
+              </span>
+
+              <strong>
+                {totalTaxes.toLocaleString(
+                  "el-GR",
+                  {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }
+                )}
+                €
+              </strong>
+            </div>
+
+          </div>
+
+
+          <div className="financial-summary-card vendors-balance">
+
+            <div className="financial-summary-icon">
+              👥
+            </div>
+
+            <div>
+              <span>
+                Πωλητές με υπόλοιπο
+              </span>
+
+              <strong>
+                {vendorsWithBalance}
+              </strong>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        {/* =========================================
+            ΓΡΑΦΗΜΑ ΑΝΑ ΠΑΝΗΓΥΡΙ
+        ========================================= */}
+
+        <div className="financial-chart-card">
+
+          <div className="financial-chart-header">
+
+            <h3>
+              Έσοδα ανά Πανηγύρι
+            </h3>
+
+            <span>
+              {selectedYear}
+            </span>
+
+          </div>
+
+
+          <div className="financial-chart">
+
+            {festivalTotals.map(
+              ({
+                festival,
+                total,
+              }) => {
+
+                const percentage =
+                  (total /
+                    maxFestivalTotal) *
+                  100;
+
+                return (
+                  <div
+                    key={festival.id}
+                    className="chart-row"
+                  >
+
+                    <div className="chart-label">
+                      <span>
+                        {festival.name}
+                      </span>
+
+                      <strong>
+                        {total.toLocaleString(
+                          "el-GR",
+                          {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          }
+                        )}
+                        €
+                      </strong>
+                    </div>
+
+
+                    <div className="chart-bar-background">
+
+                      <div
+                        className="chart-bar"
+                        style={{
+                          width: `${percentage}%`,
+                        }}
+                      />
+
+                    </div>
+
+                  </div>
+                );
+              }
+            )}
+
+          </div>
+
+        </div>
+
+
+        {/* =========================================
+            ΥΠΟΛΟΙΠΑ ΑΝΑ ΠΑΝΗΓΥΡΙ
+        ========================================= */}
+
+        <div className="balances-card">
+
+          <div className="balances-header">
+
+            <h3>
+              💳 Υπόλοιπα ανά Πανηγύρι
+            </h3>
+
+            <span>
+              {selectedYear}
+            </span>
+
+          </div>
+
+
+          <div className="balances-list">
+
+            {festivalTotals.map(
+              ({
+                festival,
+                taxes,
+              }) => (
+                <div
+                  key={festival.id}
+                  className="balance-row"
+                >
+
+                  <div className="balance-festival">
+
+                    <span className="balance-icon">
+                      🎪
+                    </span>
+
+                    <span>
+                      {festival.name}
+                    </span>
+
+                  </div>
+
+                  <strong>
+                    {taxes.toLocaleString(
+                      "el-GR",
+                      {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }
+                    )}
+                    €
+                  </strong>
+
+                </div>
+              )
+            )}
+
+          </div>
 
         </div>
 
