@@ -155,6 +155,7 @@ const matchesYear =
           onChange={(e) => setYear(e.target.value)}
         >
           <option>2026</option>
+          <option>2027</option>
           <option>2025</option>
           <option>Όλα</option>
         </select>
