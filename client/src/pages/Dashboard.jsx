@@ -17,6 +17,9 @@ function Dashboard() {
   const [festivals, setFestivals] = useState([]);
   const [payments, setPayments] = useState([]);
 
+  const [now, setNow] = useState(new Date());
+
+  // Φόρτωση δεδομένων
   useEffect(() => {
     async function loadData() {
       try {
@@ -44,6 +47,15 @@ function Dashboard() {
     loadData();
   }, []);
 
+  // Live ενημέρωση countdown κάθε δευτερόλεπτο
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setNow(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
   // Registrations του επιλεγμένου έτους
   const registrationsForSelectedYear = registrations.filter(
     (registration) =>
@@ -58,19 +70,24 @@ function Dashboard() {
 
   const today = new Date().toISOString().split("T")[0];
 
+  // Ενεργό πανηγύρι
   const activeFestival = festivals.find(
     (festival) =>
       today >= festival.startDate &&
       today <= festival.endDate
   );
 
+  // Επόμενο πανηγύρι
   const upcomingFestival = festivals
-    .filter((festival) => festival.startDate > today)
+    .filter(
+      (festival) =>
+        festival.startDate > today
+    )
     .sort((a, b) =>
       a.startDate.localeCompare(b.startDate)
     )[0];
 
-  // Συμμετέχοντες ΜΟΝΟ του τρέχοντος έτους
+  // Συμμετέχοντες ενεργού πανηγυριού
   const activeFestivalParticipants = activeFestival
     ? payments.filter(
         (payment) =>
@@ -98,43 +115,110 @@ function Dashboard() {
       );
   };
 
+  // Countdown μέχρι την έναρξη
+  const getCountdown = (startDate) => {
+    const start = new Date(startDate);
+
+    const difference = start.getTime() - now.getTime();
+
+    if (difference <= 0) {
+      return null;
+    }
+
+    const totalSeconds = Math.floor(
+      difference / 1000
+    );
+
+    const days = Math.floor(
+      totalSeconds / 86400
+    );
+
+    const hours = Math.floor(
+      (totalSeconds % 86400) / 3600
+    );
+
+    const minutes = Math.floor(
+      (totalSeconds % 3600) / 60
+    );
+
+    const seconds =
+      totalSeconds % 60;
+
+    return {
+      days,
+      hours,
+      minutes,
+      seconds,
+    };
+  };
+
   return (
     <div className="dashboard">
 
       <h1>Dashboard</h1>
 
+      {/* =========================================
+          BASIC STATISTICS
+      ========================================= */}
+
       <div className="stats-grid">
 
         <div className="stat-card">
           <div className="icon">👥</div>
-          <h2>{vendors.length}</h2>
-          <p>Συνολικοί Πωλητές</p>
+
+          <h2>
+            {vendors.length}
+          </h2>
+
+          <p>
+            Συνολικοί Πωλητές
+          </p>
         </div>
 
         <div className="stat-card">
           <div className="icon">📝</div>
-          <h2>{registrationsForSelectedYear.length}</h2>
-          <p>Εγγραφές {selectedYear}</p>
+
+          <h2>
+            {registrationsForSelectedYear.length}
+          </h2>
+
+          <p>
+            Εγγραφές {selectedYear}
+          </p>
         </div>
 
         <div className="stat-card">
           <div className="icon">🎪</div>
-          <h2>{festivals.length}</h2>
-          <p>Πανηγύρια</p>
+
+          <h2>
+            {festivals.length}
+          </h2>
+
+          <p>
+            Πανηγύρια
+          </p>
         </div>
 
       </div>
 
 
+      {/* =========================================
+          ACTIVE / NEXT FESTIVAL
+      ========================================= */}
+
       <div className="festival-grid">
 
         <div className="festival-card">
 
-          <h2>🟢 Ενεργό Πανηγύρι</h2>
+          <h2>
+            🟢 Ενεργό Πανηγύρι
+          </h2>
 
           {activeFestival ? (
             <>
-              <h3>{activeFestival.name}</h3>
+              <h3>
+                {activeFestival.name}
+              </h3>
 
               <p>
                 {activeFestival.startDate} -{" "}
@@ -167,11 +251,15 @@ function Dashboard() {
 
         <div className="festival-card">
 
-          <h2>⏳ Επόμενο Πανηγύρι</h2>
+          <h2>
+            ⏳ Επόμενο Πανηγύρι
+          </h2>
 
           {upcomingFestival ? (
             <>
-              <h3>{upcomingFestival.name}</h3>
+              <h3>
+                {upcomingFestival.name}
+              </h3>
 
               <p>
                 {upcomingFestival.startDate} -{" "}
@@ -190,14 +278,16 @@ function Dashboard() {
 
 
       {/* =========================================
-          ΣΥΝΟΛΑ ΠΑΝΗΓΥΡΙΩΝ
+          FESTIVAL TOTALS
       ========================================= */}
 
       <div className="festival-totals-section">
 
         <div className="festival-totals-header">
 
-          <h2>💰 Σύνολα Πανηγυριών</h2>
+          <h2>
+            💰 Σύνολα Πανηγυριών
+          </h2>
 
           <div className="year-selector">
 
@@ -209,13 +299,26 @@ function Dashboard() {
               id="dashboard-year"
               value={selectedYear}
               onChange={(e) =>
-                setSelectedYear(Number(e.target.value))
+                setSelectedYear(
+                  Number(e.target.value)
+                )
               }
             >
-              <option value="2025">2025</option>
-              <option value="2026">2026</option>
-              <option value="2027">2027</option>
-              <option value="2028">2028</option>
+              <option value="2025">
+                2025
+              </option>
+
+              <option value="2026">
+                2026
+              </option>
+
+              <option value="2027">
+                2027
+              </option>
+
+              <option value="2028">
+                2028
+              </option>
             </select>
 
           </div>
@@ -227,9 +330,15 @@ function Dashboard() {
 
           {festivals.map((festival) => {
 
-            const total = getFestivalTotal(
-              festival.id
-            );
+            const total =
+              getFestivalTotal(
+                festival.id
+              );
+
+            const countdown =
+              getCountdown(
+                festival.startDate
+              );
 
             return (
               <div
@@ -246,10 +355,13 @@ function Dashboard() {
                 </h3>
 
                 <div className="festival-total-amount">
-                  {total.toLocaleString("el-GR", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
+                  {total.toLocaleString(
+                    "el-GR",
+                    {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }
+                  )}
                   €
                 </div>
 
@@ -257,8 +369,43 @@ function Dashboard() {
                   Συνολικό ποσό {selectedYear}
                 </p>
 
+
+                {/* =================================
+                    COUNTDOWN
+                ================================= */}
+
+                {countdown ? (
+                  <div className="festival-countdown">
+
+                    <span>
+                      ⏳ Έναρξη σε
+                    </span>
+
+                    <strong>
+                      {countdown.days}η{" "}
+                      {String(
+                        countdown.hours
+                      ).padStart(2, "0")}
+                      :
+                      {String(
+                        countdown.minutes
+                      ).padStart(2, "0")}
+                      :
+                      {String(
+                        countdown.seconds
+                      ).padStart(2, "0")}
+                    </strong>
+
+                  </div>
+                ) : (
+                  <div className="festival-countdown started">
+                    🟢 Σε εξέλιξη
+                  </div>
+                )}
+
               </div>
             );
+
           })}
 
         </div>
