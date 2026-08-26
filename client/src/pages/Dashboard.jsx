@@ -10,7 +10,8 @@ import "../css/Dashboard.css";
 function Dashboard() {
   const currentYear = new Date().getFullYear();
 
-  const [selectedYear, setSelectedYear] = useState(currentYear);
+  const [selectedYear, setSelectedYear] =
+    useState(currentYear);
 
   const [vendors, setVendors] = useState([]);
   const [registrations, setRegistrations] = useState([]);
@@ -19,11 +20,12 @@ function Dashboard() {
 
   const [now, setNow] = useState(new Date());
 
-  // Εμφάνιση / απόκρυψη οικονομικών στοιχείων
-  const [showFinancials, setShowFinancials] = useState(true);
+  // Εμφάνιση / απόκρυψη οικονομικών
+  const [showFinancials, setShowFinancials] =
+    useState(true);
 
   // =========================================
-  // Φόρτωση δεδομένων
+  // ΦΟΡΤΩΣΗ ΔΕΔΟΜΕΝΩΝ
   // =========================================
 
   useEffect(() => {
@@ -54,7 +56,7 @@ function Dashboard() {
   }, []);
 
   // =========================================
-  // Live countdown
+  // LIVE COUNTDOWN
   // =========================================
 
   useEffect(() => {
@@ -66,7 +68,7 @@ function Dashboard() {
   }, []);
 
   // =========================================
-  // Registrations επιλεγμένου έτους
+  // REGISTRATIONS ΕΠΙΛΕΓΜΕΝΟΥ ΕΤΟΥΣ
   // =========================================
 
   const registrationsForSelectedYear =
@@ -81,7 +83,7 @@ function Dashboard() {
     );
 
   // =========================================
-  // Ημερομηνίες
+  // ΗΜΕΡΟΜΗΝΙΑ
   // =========================================
 
   const today = new Date()
@@ -89,7 +91,7 @@ function Dashboard() {
     .split("T")[0];
 
   // =========================================
-  // Ενεργό πανηγύρι
+  // ΕΝΕΡΓΟ ΠΑΝΗΓΥΡΙ
   // =========================================
 
   const activeFestival = festivals.find(
@@ -99,7 +101,7 @@ function Dashboard() {
   );
 
   // =========================================
-  // Επόμενο πανηγύρι
+  // ΕΠΟΜΕΝΟ ΠΑΝΗΓΥΡΙ
   // =========================================
 
   const upcomingFestival = festivals
@@ -108,11 +110,13 @@ function Dashboard() {
         festival.startDate > today
     )
     .sort((a, b) =>
-      a.startDate.localeCompare(b.startDate)
+      a.startDate.localeCompare(
+        b.startDate
+      )
     )[0];
 
   // =========================================
-  // Συμμετέχοντες ενεργού πανηγυριού
+  // ΣΥΜΜΕΤΕΧΟΝΤΕΣ ΕΝΕΡΓΟΥ ΠΑΝΗΓΥΡΙΟΥ
   // =========================================
 
   const activeFestivalParticipants =
@@ -128,7 +132,7 @@ function Dashboard() {
       : 0;
 
   // =========================================
-  // Συνολικό AMOUNT ανά πανηγύρι
+  // ΣΥΝΟΛΙΚΟ AMOUNT ΑΝΑ ΠΑΝΗΓΥΡΙ
   // =========================================
 
   const getFestivalTotal = (festivalId) => {
@@ -142,13 +146,14 @@ function Dashboard() {
       )
       .reduce(
         (sum, payment) =>
-          sum + Number(payment.amount || 0),
+          sum +
+          Number(payment.amount || 0),
         0
       );
   };
 
   // =========================================
-  // Συνολικό TAXES ανά πανηγύρι
+  // ΣΥΝΟΛΙΚΑ TAXES ΑΝΑ ΠΑΝΗΓΥΡΙ
   // =========================================
 
   const getFestivalTaxes = (festivalId) => {
@@ -162,85 +167,97 @@ function Dashboard() {
       )
       .reduce(
         (sum, payment) =>
-          sum + Number(payment.taxes || 0),
+          sum +
+          Number(payment.taxes || 0),
         0
       );
   };
 
   // =========================================
-  // Συνολικά έσοδα
+  // ΣΥΝΟΛΙΚΑ ΕΣΟΔΑ
   // =========================================
 
   const totalAmount = festivals.reduce(
     (sum, festival) =>
-      sum + getFestivalTotal(festival.id),
+      sum +
+      getFestivalTotal(festival.id),
     0
   );
 
   // =========================================
-  // Συνολικά υπόλοιπα
+  // ΣΥΝΟΛΙΚΑ ΥΠΟΛΟΙΠΑ
   // =========================================
 
   const totalTaxes = festivals.reduce(
     (sum, festival) =>
-      sum + getFestivalTaxes(festival.id),
+      sum +
+      getFestivalTaxes(festival.id),
     0
   );
 
   // =========================================
-  // Πωλητές με υπόλοιπο
+  // ΠΩΛΗΤΕΣ ΜΕ ΥΠΟΛΟΙΠΟ
   // =========================================
 
-  const vendorsWithBalance = new Set(
-    payments
-      .filter(
-        (payment) =>
-          registrationIdsForSelectedYear.includes(
-            payment.registrationId
-          ) &&
-          Number(payment.taxes || 0) > 0
-      )
-      .map((payment) => {
-        const registration =
-          registrations.find(
-            (r) =>
-              r.id === payment.registrationId
-          );
+  const vendorsWithBalance =
+    new Set(
+      payments
+        .filter(
+          (payment) =>
+            registrationIdsForSelectedYear.includes(
+              payment.registrationId
+            ) &&
+            Number(payment.taxes || 0) > 0
+        )
+        .map((payment) => {
+          const registration =
+            registrations.find(
+              (r) =>
+                r.id ===
+                payment.registrationId
+            );
 
-        return registration?.vendorId;
-      })
-      .filter(Boolean)
-  ).size;
+          return registration?.vendorId;
+        })
+        .filter(Boolean)
+    ).size;
 
   // =========================================
-  // Countdown
+  // COUNTDOWN
   // =========================================
 
   const getCountdown = (startDate) => {
     const start = new Date(startDate);
 
     const difference =
-      start.getTime() - now.getTime();
+      start.getTime() -
+      now.getTime();
 
     if (difference <= 0) {
       return null;
     }
 
-    const totalSeconds = Math.floor(
-      difference / 1000
-    );
+    const totalSeconds =
+      Math.floor(
+        difference / 1000
+      );
 
-    const days = Math.floor(
-      totalSeconds / 86400
-    );
+    const days =
+      Math.floor(
+        totalSeconds / 86400
+      );
 
-    const hours = Math.floor(
-      (totalSeconds % 86400) / 3600
-    );
+    const hours =
+      Math.floor(
+        (totalSeconds % 86400) /
+          3600
+      );
 
-    const minutes = Math.floor(
-      (totalSeconds % 3600) / 60
-    );
+    const minutes =
+      Math.floor(
+        (totalSeconds % 3600) /
+          60
+      );
 
     const seconds =
       totalSeconds % 60;
@@ -254,30 +271,36 @@ function Dashboard() {
   };
 
   // =========================================
-  // Δεδομένα οικονομικής εικόνας
+  // ΣΤΟΙΧΕΙΑ ΟΙΚΟΝΟΜΙΚΗΣ ΕΙΚΟΝΑΣ
   // =========================================
 
-  const festivalTotals = festivals.map(
-    (festival) => ({
-      festival,
-      total: getFestivalTotal(
-        festival.id
-      ),
-      taxes: getFestivalTaxes(
-        festival.id
-      ),
-    })
-  );
+  const festivalTotals =
+    festivals.map(
+      (festival) => ({
+        festival,
 
-  const maxFestivalTotal = Math.max(
-    ...festivalTotals.map(
-      (item) => item.total
-    ),
-    1
-  );
+        total:
+          getFestivalTotal(
+            festival.id
+          ),
+
+        taxes:
+          getFestivalTaxes(
+            festival.id
+          ),
+      })
+    );
+
+  const maxFestivalTotal =
+    Math.max(
+      ...festivalTotals.map(
+        (item) => item.total
+      ),
+      1
+    );
 
   // =========================================
-  // Format χρημάτων
+  // FORMAT ΧΡΗΜΑΤΩΝ
   // =========================================
 
   const formatMoney = (value) => {
@@ -293,7 +316,9 @@ function Dashboard() {
   return (
     <div className="dashboard">
 
-      <h1>Dashboard</h1>
+      <h1>
+        Dashboard
+      </h1>
 
       {/* =========================================
           BASIC STATISTICS
@@ -302,7 +327,10 @@ function Dashboard() {
       <div className="stats-grid">
 
         <div className="stat-card">
-          <div className="icon">👥</div>
+
+          <div className="icon">
+            👥
+          </div>
 
           <h2>
             {vendors.length}
@@ -311,22 +339,34 @@ function Dashboard() {
           <p>
             Συνολικοί Πωλητές
           </p>
+
         </div>
 
+
         <div className="stat-card">
-          <div className="icon">📝</div>
+
+          <div className="icon">
+            📝
+          </div>
 
           <h2>
-            {registrationsForSelectedYear.length}
+            {
+              registrationsForSelectedYear.length
+            }
           </h2>
 
           <p>
             Εγγραφές {selectedYear}
           </p>
+
         </div>
 
+
         <div className="stat-card">
-          <div className="icon">🎪</div>
+
+          <div className="icon">
+            🎪
+          </div>
 
           <h2>
             {festivals.length}
@@ -335,6 +375,7 @@ function Dashboard() {
           <p>
             Πανηγύρια
           </p>
+
         </div>
 
       </div>
@@ -359,13 +400,16 @@ function Dashboard() {
               </h3>
 
               <p>
-                {activeFestival.startDate} -{" "}
+                {activeFestival.startDate}
+                {" - "}
                 {activeFestival.endDate}
               </p>
 
               <p>
                 Συμμετέχοντες:{" "}
-                {activeFestivalParticipants}
+                {
+                  activeFestivalParticipants
+                }
               </p>
 
               <span className="badge active">
@@ -375,7 +419,8 @@ function Dashboard() {
           ) : (
             <>
               <h3>
-                Δεν υπάρχει ενεργό πανηγύρι
+                Δεν υπάρχει ενεργό
+                πανηγύρι
               </h3>
 
               <span className="badge inactive">
@@ -400,13 +445,15 @@ function Dashboard() {
               </h3>
 
               <p>
-                {upcomingFestival.startDate} -{" "}
+                {upcomingFestival.startDate}
+                {" - "}
                 {upcomingFestival.endDate}
               </p>
             </>
           ) : (
             <h3>
-              Δεν υπάρχουν επόμενα πανηγύρια
+              Δεν υπάρχουν επόμενα
+              πανηγύρια
             </h3>
           )}
 
@@ -416,7 +463,7 @@ function Dashboard() {
 
 
       {/* =========================================
-          FESTIVAL TOTALS
+          ΣΥΝΟΛΑ ΠΑΝΗΓΥΡΙΩΝ
       ========================================= */}
 
       <div className="festival-totals-section">
@@ -438,10 +485,13 @@ function Dashboard() {
               value={selectedYear}
               onChange={(e) =>
                 setSelectedYear(
-                  Number(e.target.value)
+                  Number(
+                    e.target.value
+                  )
                 )
               }
             >
+
               <option value="2025">
                 2025
               </option>
@@ -457,6 +507,7 @@ function Dashboard() {
               <option value="2028">
                 2028
               </option>
+
             </select>
 
           </div>
@@ -466,72 +517,95 @@ function Dashboard() {
 
         <div className="festival-totals-grid">
 
-          {festivals.map((festival) => {
+          {festivals.map(
+            (festival) => {
 
-            const total =
-              getFestivalTotal(
-                festival.id
-              );
+              const total =
+                getFestivalTotal(
+                  festival.id
+                );
 
-            const countdown =
-              getCountdown(
-                festival.startDate
-              );
+              const countdown =
+                getCountdown(
+                  festival.startDate
+                );
 
-            return (
-              <div
-                key={festival.id}
-                className="festival-total-card"
-              >
+              return (
+                <div
+                  key={festival.id}
+                  className="festival-total-card"
+                >
 
-                <div className="festival-total-icon">
-                  🎪
-                </div>
-
-                <h3>
-                  {festival.name}
-                </h3>
-
-                <div className="festival-total-amount">
-                  {formatMoney(total)}€
-                </div>
-
-                <p>
-                  Συνολικό ποσό {selectedYear}
-                </p>
-
-                {countdown ? (
-                  <div className="festival-countdown">
-
-                    <span>
-                      ⏳ Έναρξη σε
-                    </span>
-
-                    <strong>
-                      {countdown.days}η{" "}
-                      {String(
-                        countdown.hours
-                      ).padStart(2, "0")}
-                      :
-                      {String(
-                        countdown.minutes
-                      ).padStart(2, "0")}
-                      :
-                      {String(
-                        countdown.seconds
-                      ).padStart(2, "0")}
-                    </strong>
-
+                  <div className="festival-total-icon">
+                    🎪
                   </div>
-                ) : (
-                  <div className="festival-countdown started">
-                    🟢 Σε εξέλιξη
-                  </div>
-                )}
 
-              </div>
-            );
-          })}
+                  <h3>
+                    {festival.name}
+                  </h3>
+
+                  {/* ΠΟΣΟ ΜΕ BLUR */}
+
+                  <div
+                    className={`festival-total-amount ${
+                      !showFinancials
+                        ? "financial-blurred"
+                        : ""
+                    }`}
+                  >
+                    {formatMoney(total)}€
+                  </div>
+
+                  <p>
+                    Συνολικό ποσό{" "}
+                    {selectedYear}
+                  </p>
+
+
+                  {/* COUNTDOWN */}
+
+                  {countdown ? (
+                    <div className="festival-countdown">
+
+                      <span>
+                        ⏳ Έναρξη σε
+                      </span>
+
+                      <strong>
+                        {countdown.days}η{" "}
+                        {String(
+                          countdown.hours
+                        ).padStart(
+                          2,
+                          "0"
+                        )}
+                        :
+                        {String(
+                          countdown.minutes
+                        ).padStart(
+                          2,
+                          "0"
+                        )}
+                        :
+                        {String(
+                          countdown.seconds
+                        ).padStart(
+                          2,
+                          "0"
+                        )}
+                      </strong>
+
+                    </div>
+                  ) : (
+                    <div className="festival-countdown started">
+                      🟢 Σε εξέλιξη
+                    </div>
+                  )}
+
+                </div>
+              );
+            }
+          )}
 
         </div>
 
@@ -547,16 +621,20 @@ function Dashboard() {
         <div className="financial-header">
 
           <div>
+
             <h2>
               📊 Οικονομική Εικόνα
             </h2>
 
             <p>
-              Αναλυτικά στοιχεία για το {selectedYear}
+              Αναλυτικά στοιχεία για το{" "}
+              {selectedYear}
             </p>
+
           </div>
 
-          {/* Κουμπί απόκρυψης */}
+
+          {/* ΚΟΥΜΠΙ ΑΠΟΚΡΥΨΗΣ */}
 
           <button
             type="button"
@@ -578,7 +656,7 @@ function Dashboard() {
             }
           >
             {showFinancials
-              ? "🙈"
+              ? "🔒"
               : "👁️"}
           </button>
 
@@ -591,6 +669,8 @@ function Dashboard() {
 
         <div className="financial-summary">
 
+          {/* ΣΥΝΟΛΙΚΑ ΕΣΟΔΑ */}
+
           <div className="financial-summary-card income">
 
             <div className="financial-summary-icon">
@@ -598,6 +678,7 @@ function Dashboard() {
             </div>
 
             <div>
+
               <span>
                 Συνολικά Έσοδα
               </span>
@@ -605,20 +686,21 @@ function Dashboard() {
               <strong
                 className={
                   !showFinancials
-                    ? "financial-hidden"
+                    ? "financial-blurred"
                     : ""
                 }
               >
-                {showFinancials
-                  ? `${formatMoney(
-                      totalAmount
-                    )} €`
-                  : "••••••••"}
+                {formatMoney(
+                  totalAmount
+                )} €
               </strong>
+
             </div>
 
           </div>
 
+
+          {/* ΥΠΟΛΟΙΠΑ */}
 
           <div className="financial-summary-card balance">
 
@@ -627,6 +709,7 @@ function Dashboard() {
             </div>
 
             <div>
+
               <span>
                 Υπόλοιπα προς είσπραξη
               </span>
@@ -634,20 +717,21 @@ function Dashboard() {
               <strong
                 className={
                   !showFinancials
-                    ? "financial-hidden"
+                    ? "financial-blurred"
                     : ""
                 }
               >
-                {showFinancials
-                  ? `${formatMoney(
-                      totalTaxes
-                    )} €`
-                  : "••••••••"}
+                {formatMoney(
+                  totalTaxes
+                )} €
               </strong>
+
             </div>
 
           </div>
 
+
+          {/* ΠΩΛΗΤΕΣ ΜΕ ΥΠΟΛΟΙΠΟ */}
 
           <div className="financial-summary-card vendors-balance">
 
@@ -656,6 +740,7 @@ function Dashboard() {
             </div>
 
             <div>
+
               <span>
                 Πωλητές με υπόλοιπο
               </span>
@@ -663,6 +748,7 @@ function Dashboard() {
               <strong>
                 {vendorsWithBalance}
               </strong>
+
             </div>
 
           </div>
@@ -717,15 +803,13 @@ function Dashboard() {
                       <strong
                         className={
                           !showFinancials
-                            ? "financial-hidden chart-hidden"
+                            ? "financial-blurred"
                             : ""
                         }
                       >
-                        {showFinancials
-                          ? `${formatMoney(
-                              total
-                            )} €`
-                          : "••••••"}
+                        {formatMoney(
+                          total
+                        )} €
                       </strong>
 
                     </div>
@@ -734,13 +818,11 @@ function Dashboard() {
                     <div className="chart-bar-background">
 
                       <div
-                        className={
-                          showFinancials
-                            ? "chart-bar"
-                            : "chart-bar chart-bar-hidden"
-                        }
+                        className="chart-bar"
                         style={{
-                          width: `${percentage}%`,
+                          width: showFinancials
+                            ? `${percentage}%`
+                            : "100%",
                         }}
                       />
 
@@ -782,6 +864,7 @@ function Dashboard() {
                 festival,
                 taxes,
               }) => (
+
                 <div
                   key={festival.id}
                   className="balance-row"
@@ -799,21 +882,21 @@ function Dashboard() {
 
                   </div>
 
+
                   <strong
                     className={
                       !showFinancials
-                        ? "financial-hidden"
+                        ? "financial-blurred"
                         : ""
                     }
                   >
-                    {showFinancials
-                      ? `${formatMoney(
-                          taxes
-                        )} €`
-                      : "••••••"}
+                    {formatMoney(
+                      taxes
+                    )} €
                   </strong>
 
                 </div>
+
               )
             )}
 
