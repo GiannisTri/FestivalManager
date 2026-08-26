@@ -1297,223 +1297,256 @@ body {
   }
 }
 
+/* =========================================
+   FINAL MOBILE NAVBAR FIX
+========================================= */
+
 @media (max-width: 768px) {
 
-  /* ==============================
-     MOBILE NAVBAR
-  ============================== */
-
   .navbar {
-    min-height: 70px;
-    padding: 0 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: relative;
-    z-index: 1000;
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+
+    min-height: 70px !important;
+    height: 70px !important;
+
+    padding: 0 16px !important;
+    margin: 0 !important;
+
+    z-index: 1000 !important;
   }
 
   .navbar h2 {
-    font-size: 20px;
-    margin: 0;
+    margin: 0 !important;
+    font-size: 20px !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
   }
+
+  /* USER AREA */
 
   .user-menu {
-    position: relative;
-    display: flex;
-    align-items: center;
+    position: relative !important;
+
+    width: 50px !important;
+    height: 50px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    z-index: 2000 !important;
   }
 
-  /* ==============================
-     USER BUTTON
-  ============================== */
+  /* BUTTON */
 
   .user-button {
-    position: relative;
+    position: relative !important;
 
-    width: 48px;
-    height: 48px;
+    width: 50px !important;
+    height: 50px !important;
 
-    padding: 0;
-    margin: 0;
+    margin: 0 !important;
+    padding: 0 !important;
 
-    border: none;
-    background: transparent;
+    border: 0 !important;
+    background: transparent !important;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 
-    cursor: pointer;
+    overflow: visible !important;
   }
+
+  /* AVATAR */
 
   .user-button .avatar {
-    width: 44px;
-    height: 44px;
+    position: relative !important;
 
-    min-width: 44px;
-    min-height: 44px;
+    width: 44px !important;
+    height: 44px !important;
 
-    border-radius: 50%;
+    min-width: 44px !important;
+    min-height: 44px !important;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    max-width: 44px !important;
+    max-height: 44px !important;
 
-    background: #2563eb;
-    color: white;
+    margin: 0 !important;
+    padding: 0 !important;
 
-    font-size: 21px;
-    font-weight: 600;
+    border-radius: 50% !important;
 
-    border: 3px solid white;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 
-    box-sizing: border-box;
+    background: #2563eb !important;
+    color: white !important;
+
+    border: 3px solid white !important;
+    box-sizing: border-box !important;
+
+    font-size: 21px !important;
+    font-weight: 600 !important;
+
+    transform: none !important;
   }
 
-  /* Κρύβουμε username στο mobile */
+  /* USERNAME ΚΡΥΦΟ ΣΤΟ MOBILE */
+
   .user-button > span:not(.arrow) {
-    display: none;
+    display: none !important;
   }
 
-  /* ==============================
-     ARROW
-  ============================== */
+  /* ARROW */
 
   .user-button .arrow {
-    position: absolute;
+    position: absolute !important;
 
-    right: -3px;
-    bottom: -2px;
+    right: -2px !important;
+    bottom: -2px !important;
 
-    width: 19px;
-    height: 19px;
+    width: 18px !important;
+    height: 18px !important;
 
-    border-radius: 50%;
+    min-width: 18px !important;
+    min-height: 18px !important;
 
-    background: white;
-    color: #64748b;
+    margin: 0 !important;
+    padding: 0 !important;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    border-radius: 50% !important;
 
-    font-size: 8px;
+    background: white !important;
+    color: #64748b !important;
 
-    box-shadow: 0 2px 6px rgba(0,0,0,.15);
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 
-    z-index: 5;
+    font-size: 8px !important;
+    line-height: 1 !important;
+
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18) !important;
+
+    z-index: 10 !important;
   }
 
-  /* ==============================
-     DROPDOWN
-  ============================== */
+  /* DROPDOWN */
 
   .dropdown {
-    position: absolute;
+    position: absolute !important;
 
-    top: calc(100% + 10px);
-    right: 0;
+    top: 58px !important;
+    right: 0 !important;
+    left: auto !important;
 
-    width: 230px;
-    max-width: calc(100vw - 24px);
+    width: 230px !important;
+    max-width: calc(100vw - 24px) !important;
 
-    background: white;
+    margin: 0 !important;
+    padding: 0 !important;
 
-    border-radius: 16px;
+    background: white !important;
 
-    box-shadow:
-      0 12px 35px rgba(0,0,0,.18);
+    border-radius: 16px !important;
 
-    overflow: hidden;
+    overflow: hidden !important;
 
-    z-index: 2000;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.20) !important;
+
+    z-index: 9999 !important;
+
+    transform: none !important;
   }
 
-  /* ==============================
-     DROPDOWN USER
-  ============================== */
+  /* DROPDOWN USER */
 
   .dropdown-user {
-    padding: 18px;
+    display: flex !important;
+    align-items: center !important;
 
-    display: flex;
-    align-items: center;
+    gap: 12px !important;
 
-    gap: 12px;
+    padding: 18px !important;
+
+    margin: 0 !important;
   }
 
   .dropdown-user .avatar.big {
-    width: 48px;
-    height: 48px;
+    width: 46px !important;
+    height: 46px !important;
 
-    min-width: 48px;
-    min-height: 48px;
+    min-width: 46px !important;
+    min-height: 46px !important;
 
-    border-radius: 50%;
+    max-width: 46px !important;
+    max-height: 46px !important;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    margin: 0 !important;
+    padding: 0 !important;
 
-    background: #2563eb;
-    color: white;
+    border-radius: 50% !important;
 
-    font-size: 22px;
-    font-weight: 600;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    background: #2563eb !important;
+    color: white !important;
+
+    font-size: 21px !important;
   }
 
   .dropdown-user strong {
-    font-size: 18px;
-    color: #1e293b;
+    font-size: 18px !important;
+    color: #1e293b !important;
   }
 
   .dropdown-user p {
-    margin: 3px 0 0;
+    margin: 3px 0 0 !important;
 
-    color: #64748b;
-    font-size: 14px;
+    font-size: 14px !important;
+    color: #64748b !important;
   }
-
-  /* ==============================
-     SEPARATOR
-  ============================== */
 
   .dropdown hr {
-    margin: 0;
-
-    border: none;
-    border-top: 1px solid #e2e8f0;
+    margin: 0 !important;
+    border: 0 !important;
+    border-top: 1px solid #e2e8f0 !important;
   }
 
-  /* ==============================
-     LOGOUT
-  ============================== */
+  /* LOGOUT */
 
   .logout-btn {
-    width: 100%;
+    width: 100% !important;
 
-    padding: 16px 18px;
+    min-height: 56px !important;
 
-    border: none;
-    background: white;
+    margin: 0 !important;
+    padding: 14px 18px !important;
 
-    display: flex;
-    align-items: center;
+    border: 0 !important;
+    background: white !important;
 
-    gap: 10px;
+    display: flex !important;
+    align-items: center !important;
 
-    font-size: 16px;
+    gap: 10px !important;
 
-    color: #1e293b;
+    font-size: 17px !important;
+    color: #1e293b !important;
 
-    text-align: left;
+    text-align: left !important;
 
-    cursor: pointer;
-  }
-
-  .logout-btn:hover {
-    background: #f8fafc;
+    cursor: pointer !important;
   }
 
 }
