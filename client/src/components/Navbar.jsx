@@ -8,34 +8,12 @@ function Navbar() {
 
   const [open, setOpen] = useState(false);
 
-  const [darkMode, setDarkMode] = useState(() => {
-    return localStorage.getItem("theme") === "dark";
-  });
-
   const menuRef = useRef(null);
 
   const user = authService.getUser();
 
   const username = user?.username || "Χρήστης";
   const role = user?.role || "";
-
-  // =========================================
-  // DARK MODE
-  // =========================================
-
-  useEffect(() => {
-    if (darkMode) {
-      document.body.classList.add("dark-mode");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.body.classList.remove("dark-mode");
-      localStorage.setItem("theme", "light");
-    }
-  }, [darkMode]);
-
-  // =========================================
-  // CLOSE USER MENU
-  // =========================================
 
   useEffect(() => {
     function handleClick(e) {
@@ -59,10 +37,6 @@ function Navbar() {
       );
   }, []);
 
-  // =========================================
-  // LOGOUT
-  // =========================================
-
   function handleLogout() {
     authService.logout();
 
@@ -78,110 +52,68 @@ function Navbar() {
         Festival Manager
       </h2>
 
-      <div className="navbar-actions">
-
-        {/* =====================================
-            THEME TOGGLE
-        ===================================== */}
+      <div
+        className="user-menu"
+        ref={menuRef}
+      >
 
         <button
-          type="button"
-          className={`theme-toggle ${
-            darkMode ? "dark" : "light"
-          }`}
-          onClick={() =>
-            setDarkMode(
-              (prev) => !prev
-            )
-          }
-          aria-label={
-            darkMode
-              ? "Ενεργοποίηση light mode"
-              : "Ενεργοποίηση dark mode"
-          }
-          title={
-            darkMode
-              ? "Light mode"
-              : "Dark mode"
-          }
+          className="user-button"
+          onClick={() => setOpen(!open)}
         >
-          <span className="theme-icon">
-            {darkMode ? "☀️" : "🌙"}
+
+          <div className="avatar">
+            {username
+              .charAt(0)
+              .toUpperCase()}
+          </div>
+
+          <span>
+            {username}
           </span>
+
+          <span className="arrow">
+            {open ? "▲" : "▼"}
+          </span>
+
         </button>
 
+        {open && (
+          <div className="dropdown">
 
-        {/* =====================================
-            USER MENU
-        ===================================== */}
+            <div className="dropdown-user">
 
-        <div
-          className="user-menu"
-          ref={menuRef}
-        >
+              <div className="avatar big">
+                {username
+                  .charAt(0)
+                  .toUpperCase()}
+              </div>
 
-          <button
-            className="user-button"
-            onClick={() =>
-              setOpen(!open)
-            }
-          >
+              <div>
 
-            <div className="avatar">
-              {username
-                .charAt(0)
-                .toUpperCase()}
-            </div>
+                <strong>
+                  {username}
+                </strong>
 
-            <span>
-              {username}
-            </span>
-
-            <span className="arrow">
-              {open ? "▲" : "▼"}
-            </span>
-
-          </button>
-
-
-          {open && (
-            <div className="dropdown">
-
-              <div className="dropdown-user">
-
-                <div className="avatar big">
-                  {username
-                    .charAt(0)
-                    .toUpperCase()}
-                </div>
-
-                <div>
-
-                  <strong>
-                    {username}
-                  </strong>
-
-                  <p>
-                    {role}
-                  </p>
-
-                </div>
+                <p>
+                  {role}
+                </p>
 
               </div>
 
-              <hr />
-
-              <button
-                className="logout-btn"
-                onClick={handleLogout}
-              >
-                🚪 Logout
-              </button>
-
             </div>
-          )}
 
-        </div>
+            <hr />
+
+            <button
+              className="logout-btn"
+              onClick={handleLogout}
+            >
+              🚪 Logout
+            </button>
+
+          </div>
+        )}
 
       </div>
 
