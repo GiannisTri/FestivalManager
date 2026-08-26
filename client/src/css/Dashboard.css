@@ -783,3 +783,371 @@
   }
 
 }
+/* =========================================
+   💡 SMART INSIGHTS
+========================================= */
+
+.smart-insights-section {
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
+
+.smart-insights-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.smart-insights-header h2 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 26px;
+}
+
+.smart-insights-header p {
+  margin: 6px 0 0;
+  color: #64748b;
+  font-size: 15px;
+}
+
+.smart-insights-badge {
+  padding: 8px 16px;
+  border-radius: 30px;
+  background: linear-gradient(
+    135deg,
+    #eef2ff,
+    #e0e7ff
+  );
+  color: #4f46e5;
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.12);
+}
+
+
+/* =========================================
+   INSIGHTS GRID
+========================================= */
+
+.smart-insights-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+
+/* =========================================
+   INSIGHT CARD
+========================================= */
+
+.smart-insight-card {
+  position: relative;
+
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+
+  min-height: 150px;
+
+  padding: 22px;
+
+  background: white;
+
+  border-radius: 18px;
+
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.07);
+
+  border: 1px solid #f1f5f9;
+
+  overflow: hidden;
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.smart-insight-card::before {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  top: 0;
+  bottom: 0;
+
+  width: 4px;
+
+  background: #2563eb;
+}
+
+.smart-insight-card:hover {
+  transform: translateY(-5px);
+
+  box-shadow:
+    0 18px 35px rgba(0, 0, 0, 0.11);
+}
+
+
+/* =========================================
+   ICON
+========================================= */
+
+.smart-insight-icon {
+  width: 52px;
+  height: 52px;
+
+  min-width: 52px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 15px;
+
+  background: #f1f5f9;
+
+  font-size: 25px;
+
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.03);
+}
+
+
+/* =========================================
+   CONTENT
+========================================= */
+
+.smart-insight-content {
+  min-width: 0;
+  flex: 1;
+}
+
+.smart-insight-label {
+  display: block;
+
+  margin-bottom: 6px;
+
+  color: #64748b;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.4px;
+}
+
+.smart-insight-content h3 {
+  margin: 0 0 8px;
+
+  color: #0f172a;
+
+  font-size: 21px;
+
+  line-height: 1.25;
+}
+
+.smart-insight-content p {
+  margin: 0;
+
+  color: #64748b;
+
+  font-size: 14px;
+
+  line-height: 1.5;
+}
+
+.smart-insight-content strong {
+  color: #0f172a;
+}
+
+
+/* =========================================
+   DIFFERENT CARD TYPES
+========================================= */
+
+.smart-insight-card.top::before {
+  background: #f59e0b;
+}
+
+.smart-insight-card.top
+.smart-insight-icon {
+  background: #fef3c7;
+}
+
+
+.smart-insight-card.success::before {
+  background: #22c55e;
+}
+
+.smart-insight-card.success
+.smart-insight-icon {
+  background: #dcfce7;
+}
+
+
+.smart-insight-card.warning::before {
+  background: #f59e0b;
+}
+
+.smart-insight-card.warning
+.smart-insight-icon {
+  background: #fef3c7;
+}
+
+
+.smart-insight-card.popular::before {
+  background: #8b5cf6;
+}
+
+.smart-insight-card.popular
+.smart-insight-icon {
+  background: #ede9fe;
+}
+
+
+.smart-insight-card.vendor::before {
+  background: #ec4899;
+}
+
+.smart-insight-card.vendor
+.smart-insight-icon {
+  background: #fce7f3;
+}
+
+
+.smart-insight-card.live::before {
+  background: #ef4444;
+}
+
+.smart-insight-card.live
+.smart-insight-icon {
+  background: #fee2e2;
+}
+
+
+/* =========================================
+   PROGRESS BAR
+========================================= */
+
+.smart-progress {
+  width: 100%;
+  height: 8px;
+
+  margin: 10px 0 8px;
+
+  background: #e2e8f0;
+
+  border-radius: 20px;
+
+  overflow: hidden;
+}
+
+.smart-progress-bar {
+  height: 100%;
+
+  background: linear-gradient(
+    90deg,
+    #22c55e,
+    #16a34a
+  );
+
+  border-radius: 20px;
+
+  transition: width 0.5s ease;
+}
+
+
+/* =========================================
+   FINANCIAL BLUR
+========================================= */
+
+.smart-insight-content
+.financial-blurred {
+  filter: blur(7px);
+
+  user-select: none;
+
+  pointer-events: none;
+
+  transition: filter 0.25s ease;
+}
+
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media (max-width: 1100px) {
+
+  .smart-insights-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 600px) {
+
+  .smart-insights-section {
+    margin-top: 30px;
+  }
+
+  .smart-insights-header {
+    align-items: flex-start;
+  }
+
+  .smart-insights-header h2 {
+    font-size: 22px;
+  }
+
+  .smart-insights-header p {
+    font-size: 14px;
+  }
+
+  .smart-insights-badge {
+    padding: 7px 12px;
+    font-size: 12px;
+
+    flex-shrink: 0;
+  }
+
+  .smart-insights-grid {
+    grid-template-columns: 1fr;
+
+    gap: 15px;
+  }
+
+  .smart-insight-card {
+    min-height: auto;
+
+    padding: 18px;
+  }
+
+  .smart-insight-icon {
+    width: 46px;
+    height: 46px;
+
+    min-width: 46px;
+
+    font-size: 22px;
+  }
+
+  .smart-insight-content h3 {
+    font-size: 19px;
+  }
+
+  .smart-insight-content p {
+    font-size: 13px;
+  }
+
+}
