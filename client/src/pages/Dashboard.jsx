@@ -19,6 +19,9 @@ function Dashboard() {
 
   const [now, setNow] = useState(new Date());
 
+  // Εμφάνιση / απόκρυψη οικονομικών στοιχείων
+  const [showFinancials, setShowFinancials] = useState(true);
+
   // =========================================
   // Φόρτωση δεδομένων
   // =========================================
@@ -165,7 +168,7 @@ function Dashboard() {
   };
 
   // =========================================
-  // Συνολικά AMOUNT
+  // Συνολικά έσοδα
   // =========================================
 
   const totalAmount = festivals.reduce(
@@ -175,7 +178,7 @@ function Dashboard() {
   );
 
   // =========================================
-  // Συνολικά ΥΠΟΛΟΙΠΑ
+  // Συνολικά υπόλοιπα
   // =========================================
 
   const totalTaxes = festivals.reduce(
@@ -251,7 +254,7 @@ function Dashboard() {
   };
 
   // =========================================
-  // Μεγαλύτερο ποσό για το γράφημα
+  // Δεδομένα οικονομικής εικόνας
   // =========================================
 
   const festivalTotals = festivals.map(
@@ -272,6 +275,20 @@ function Dashboard() {
     ),
     1
   );
+
+  // =========================================
+  // Format χρημάτων
+  // =========================================
+
+  const formatMoney = (value) => {
+    return value.toLocaleString(
+      "el-GR",
+      {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }
+    );
+  };
 
   return (
     <div className="dashboard">
@@ -476,14 +493,7 @@ function Dashboard() {
                 </h3>
 
                 <div className="festival-total-amount">
-                  {total.toLocaleString(
-                    "el-GR",
-                    {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    }
-                  )}
-                  €
+                  {formatMoney(total)}€
                 </div>
 
                 <p>
@@ -521,7 +531,6 @@ function Dashboard() {
 
               </div>
             );
-
           })}
 
         </div>
@@ -547,8 +556,38 @@ function Dashboard() {
             </p>
           </div>
 
+          {/* Κουμπί απόκρυψης */}
+
+          <button
+            type="button"
+            className="financial-visibility-btn"
+            onClick={() =>
+              setShowFinancials(
+                (prev) => !prev
+              )
+            }
+            aria-label={
+              showFinancials
+                ? "Απόκρυψη οικονομικών στοιχείων"
+                : "Εμφάνιση οικονομικών στοιχείων"
+            }
+            title={
+              showFinancials
+                ? "Απόκρυψη ποσών"
+                : "Εμφάνιση ποσών"
+            }
+          >
+            {showFinancials
+              ? "🙈"
+              : "👁️"}
+          </button>
+
         </div>
 
+
+        {/* =========================================
+            SUMMARY CARDS
+        ========================================= */}
 
         <div className="financial-summary">
 
@@ -563,15 +602,18 @@ function Dashboard() {
                 Συνολικά Έσοδα
               </span>
 
-              <strong>
-                {totalAmount.toLocaleString(
-                  "el-GR",
-                  {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  }
-                )}
-                €
+              <strong
+                className={
+                  !showFinancials
+                    ? "financial-hidden"
+                    : ""
+                }
+              >
+                {showFinancials
+                  ? `${formatMoney(
+                      totalAmount
+                    )} €`
+                  : "••••••••"}
               </strong>
             </div>
 
@@ -589,15 +631,18 @@ function Dashboard() {
                 Υπόλοιπα προς είσπραξη
               </span>
 
-              <strong>
-                {totalTaxes.toLocaleString(
-                  "el-GR",
-                  {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  }
-                )}
-                €
+              <strong
+                className={
+                  !showFinancials
+                    ? "financial-hidden"
+                    : ""
+                }
+              >
+                {showFinancials
+                  ? `${formatMoney(
+                      totalTaxes
+                    )} €`
+                  : "••••••••"}
               </strong>
             </div>
 
@@ -664,27 +709,36 @@ function Dashboard() {
                   >
 
                     <div className="chart-label">
+
                       <span>
                         {festival.name}
                       </span>
 
-                      <strong>
-                        {total.toLocaleString(
-                          "el-GR",
-                          {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          }
-                        )}
-                        €
+                      <strong
+                        className={
+                          !showFinancials
+                            ? "financial-hidden chart-hidden"
+                            : ""
+                        }
+                      >
+                        {showFinancials
+                          ? `${formatMoney(
+                              total
+                            )} €`
+                          : "••••••"}
                       </strong>
+
                     </div>
 
 
                     <div className="chart-bar-background">
 
                       <div
-                        className="chart-bar"
+                        className={
+                          showFinancials
+                            ? "chart-bar"
+                            : "chart-bar chart-bar-hidden"
+                        }
                         style={{
                           width: `${percentage}%`,
                         }}
@@ -745,15 +799,18 @@ function Dashboard() {
 
                   </div>
 
-                  <strong>
-                    {taxes.toLocaleString(
-                      "el-GR",
-                      {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      }
-                    )}
-                    €
+                  <strong
+                    className={
+                      !showFinancials
+                        ? "financial-hidden"
+                        : ""
+                    }
+                  >
+                    {showFinancials
+                      ? `${formatMoney(
+                          taxes
+                        )} €`
+                      : "••••••"}
                   </strong>
 
                 </div>
