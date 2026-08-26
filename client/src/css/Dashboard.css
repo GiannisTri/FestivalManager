@@ -615,3 +615,97 @@
   }
 
 }
+
+/* =========================================
+   FINANCIAL VISIBILITY BUTTON
+========================================= */
+
+.financial-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.financial-visibility-btn {
+  width: 46px;
+  height: 46px;
+
+  border: none;
+  border-radius: 12px;
+
+  background: #f1f5f9;
+  color: #334155;
+
+  font-size: 21px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.financial-visibility-btn:hover {
+  background: #e2e8f0;
+
+  transform: translateY(-2px);
+
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.08);
+}
+
+.financial-visibility-btn:active {
+  transform: scale(0.94);
+}
+
+
+/* =========================================
+   HIDDEN FINANCIAL VALUES
+========================================= */
+
+.financial-hidden {
+  letter-spacing: 3px;
+  font-weight: 700;
+}
+
+.chart-hidden {
+  min-width: 80px;
+  text-align: right;
+}
+
+
+/* =========================================
+   HIDDEN CHART
+========================================= */
+
+.chart-bar-hidden {
+  width: 100% !important;
+
+  background: #e2e8f0;
+
+  opacity: 0.55;
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 600px) {
+
+  .financial-header {
+    align-items: flex-start;
+  }
+
+  .financial-visibility-btn {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+  }
+
+}
