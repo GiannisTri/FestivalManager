@@ -1297,41 +1297,42 @@ body {
   }
 }
 
-/* =========================================
-   MOBILE NAVBAR
-========================================= */
-
 @media (max-width: 768px) {
 
+  /* ==============================
+     MOBILE NAVBAR
+  ============================== */
+
   .navbar {
-    position: relative;
     min-height: 70px;
-    padding: 0 15px;
+    padding: 0 16px;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    position: relative;
+    z-index: 1000;
   }
 
   .navbar h2 {
     font-size: 20px;
-    white-space: nowrap;
+    margin: 0;
   }
 
   .user-menu {
     position: relative;
     display: flex;
     align-items: center;
-    margin-left: 10px;
   }
+
+  /* ==============================
+     USER BUTTON
+  ============================== */
 
   .user-button {
     position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 
-    width: 52px;
-    height: 52px;
+    width: 48px;
+    height: 48px;
 
     padding: 0;
     margin: 0;
@@ -1339,17 +1340,19 @@ body {
     border: none;
     background: transparent;
 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
     cursor: pointer;
   }
 
   .user-button .avatar {
-    position: relative;
+    width: 44px;
+    height: 44px;
 
-    width: 42px;
-    height: 42px;
-
-    min-width: 42px;
-    min-height: 42px;
+    min-width: 44px;
+    min-height: 44px;
 
     border-radius: 50%;
 
@@ -1357,79 +1360,160 @@ body {
     align-items: center;
     justify-content: center;
 
+    background: #2563eb;
+    color: white;
+
     font-size: 21px;
     font-weight: 600;
-
-    color: white;
-    background: #2563eb;
 
     border: 3px solid white;
 
     box-sizing: border-box;
   }
 
-  /* Κρύβουμε το username στο κινητό */
+  /* Κρύβουμε username στο mobile */
   .user-button > span:not(.arrow) {
     display: none;
   }
 
-  /* Μικρό κυκλικό βελάκι */
+  /* ==============================
+     ARROW
+  ============================== */
+
   .user-button .arrow {
     position: absolute;
 
-    right: -2px;
+    right: -3px;
     bottom: -2px;
 
-    width: 20px;
-    height: 20px;
+    width: 19px;
+    height: 19px;
 
     border-radius: 50%;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
 
     background: white;
     color: #64748b;
 
-    font-size: 9px;
-    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    font-size: 8px;
 
-    z-index: 2;
+    box-shadow: 0 2px 6px rgba(0,0,0,.15);
+
+    z-index: 5;
   }
 
-  /* Dropdown */
+  /* ==============================
+     DROPDOWN
+  ============================== */
+
   .dropdown {
     position: absolute;
 
-    top: calc(100% + 8px);
+    top: calc(100% + 10px);
     right: 0;
 
-    width: 220px;
+    width: 230px;
+    max-width: calc(100vw - 24px);
 
-    z-index: 1000;
+    background: white;
+
+    border-radius: 16px;
+
+    box-shadow:
+      0 12px 35px rgba(0,0,0,.18);
+
+    overflow: hidden;
+
+    z-index: 2000;
   }
 
+  /* ==============================
+     DROPDOWN USER
+  ============================== */
+
   .dropdown-user {
+    padding: 18px;
+
     display: flex;
     align-items: center;
+
     gap: 12px;
   }
 
   .dropdown-user .avatar.big {
-    width: 42px;
-    height: 42px;
+    width: 48px;
+    height: 48px;
 
-    min-width: 42px;
-    min-height: 42px;
+    min-width: 48px;
+    min-height: 48px;
 
     border-radius: 50%;
 
     display: flex;
     align-items: center;
     justify-content: center;
+
+    background: #2563eb;
+    color: white;
+
+    font-size: 22px;
+    font-weight: 600;
+  }
+
+  .dropdown-user strong {
+    font-size: 18px;
+    color: #1e293b;
+  }
+
+  .dropdown-user p {
+    margin: 3px 0 0;
+
+    color: #64748b;
+    font-size: 14px;
+  }
+
+  /* ==============================
+     SEPARATOR
+  ============================== */
+
+  .dropdown hr {
+    margin: 0;
+
+    border: none;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  /* ==============================
+     LOGOUT
+  ============================== */
+
+  .logout-btn {
+    width: 100%;
+
+    padding: 16px 18px;
+
+    border: none;
+    background: white;
+
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    font-size: 16px;
+
+    color: #1e293b;
+
+    text-align: left;
+
+    cursor: pointer;
+  }
+
+  .logout-btn:hover {
+    background: #f8fafc;
   }
 
 }
