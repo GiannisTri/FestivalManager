@@ -250,13 +250,13 @@ function Dashboard() {
     const hours =
       Math.floor(
         (totalSeconds % 86400) /
-          3600
+        3600
       );
 
     const minutes =
       Math.floor(
         (totalSeconds % 3600) /
-          60
+        60
       );
 
     const seconds =
@@ -313,6 +313,148 @@ function Dashboard() {
     );
   };
 
+  // =========================================
+  // SMART INSIGHTS
+  // =========================================
+
+  const totalPossible =
+    totalAmount + totalTaxes;
+
+  const collectionPercentage =
+    totalPossible > 0
+      ? (totalAmount / totalPossible) *
+        100
+      : 0;
+
+  // Καλύτερο πανηγύρι σε έσοδα
+  const topFestival =
+    festivalTotals.length > 0
+      ? [...festivalTotals]
+          .sort(
+            (a, b) =>
+              b.total - a.total
+          )[0]
+      : null;
+
+  // Πανηγύρι με περισσότερους πωλητές
+  const festivalParticipants =
+    festivals.map(
+      (festival) => {
+        const participantIds =
+          new Set(
+            payments
+              .filter(
+                (payment) =>
+                  payment.festivalId ===
+                    festival.id &&
+                  registrationIdsForSelectedYear.includes(
+                    payment.registrationId
+                  )
+              )
+              .map((payment) => {
+                const registration =
+                  registrations.find(
+                    (r) =>
+                      r.id ===
+                      payment.registrationId
+                  );
+
+                return registration?.vendorId;
+              })
+              .filter(Boolean)
+          );
+
+        return {
+          festival,
+          count:
+            participantIds.size,
+        };
+      }
+    );
+
+  const mostPopularFestival =
+    festivalParticipants.length > 0
+      ? [...festivalParticipants]
+          .sort(
+            (a, b) =>
+              b.count - a.count
+          )[0]
+      : null;
+
+  // Πωλητής με τα περισσότερα έσοδα
+  const vendorTotals = vendors.map(
+    (vendor) => {
+      const vendorRegistrationIds =
+        registrations
+          .filter(
+            (registration) =>
+              registration.vendorId ===
+                vendor.id &&
+              registration.year ===
+                Number(selectedYear)
+          )
+          .map(
+            (registration) =>
+              registration.id
+          );
+
+      const total =
+        payments
+          .filter(
+            (payment) =>
+              vendorRegistrationIds.includes(
+                payment.registrationId
+              )
+          )
+          .reduce(
+            (sum, payment) =>
+              sum +
+              Number(
+                payment.amount || 0
+              ),
+            0
+          );
+
+      return {
+        vendor,
+        total,
+      };
+    }
+  );
+
+  const topVendor =
+    vendorTotals.length > 0
+      ? [...vendorTotals]
+          .sort(
+            (a, b) =>
+              b.total - a.total
+          )[0]
+      : null;
+
+  // Πόσοι έχουν υπόλοιπο
+  const balanceStatus =
+    vendorsWithBalance > 0
+      ? {
+          type: "warning",
+          icon: "⚠️",
+          title:
+            "Υπάρχουν εκκρεμή υπόλοιπα",
+          text:
+            `${vendorsWithBalance} πωλητές έχουν ` +
+            `συνολικό υπόλοιπο ${formatMoney(
+              totalTaxes
+            )}€`,
+        }
+      : {
+          type: "success",
+          icon: "🎉",
+          title:
+            "Όλα τακτοποιημένα",
+          text:
+            `Δεν υπάρχουν εκκρεμή υπόλοιπα ` +
+            `για το ${selectedYear}.`,
+        };
+
   return (
     <div className="dashboard">
 
@@ -327,7 +469,6 @@ function Dashboard() {
       <div className="stats-grid">
 
         <div className="stat-card">
-
           <div className="icon">
             👥
           </div>
@@ -339,12 +480,9 @@ function Dashboard() {
           <p>
             Συνολικοί Πωλητές
           </p>
-
         </div>
 
-
         <div className="stat-card">
-
           <div className="icon">
             📝
           </div>
@@ -358,12 +496,9 @@ function Dashboard() {
           <p>
             Εγγραφές {selectedYear}
           </p>
-
         </div>
 
-
         <div className="stat-card">
-
           <div className="icon">
             🎪
           </div>
@@ -375,7 +510,6 @@ function Dashboard() {
           <p>
             Πανηγύρια
           </p>
-
         </div>
 
       </div>
@@ -491,7 +625,6 @@ function Dashboard() {
                 )
               }
             >
-
               <option value="2025">
                 2025
               </option>
@@ -507,7 +640,6 @@ function Dashboard() {
               <option value="2028">
                 2028
               </option>
-
             </select>
 
           </div>
@@ -544,8 +676,6 @@ function Dashboard() {
                     {festival.name}
                   </h3>
 
-                  {/* ΠΟΣΟ ΜΕ BLUR */}
-
                   <div
                     className={`festival-total-amount ${
                       !showFinancials
@@ -553,16 +683,16 @@ function Dashboard() {
                         : ""
                     }`}
                   >
-                    {formatMoney(total)}€
+                    {formatMoney(
+                      total
+                    )}
+                    €
                   </div>
 
                   <p>
                     Συνολικό ποσό{" "}
                     {selectedYear}
                   </p>
-
-
-                  {/* COUNTDOWN */}
 
                   {countdown ? (
                     <div className="festival-countdown">
@@ -633,9 +763,6 @@ function Dashboard() {
 
           </div>
 
-
-          {/* ΚΟΥΜΠΙ ΑΠΟΚΡΥΨΗΣ */}
-
           <button
             type="button"
             className="financial-visibility-btn"
@@ -663,13 +790,9 @@ function Dashboard() {
         </div>
 
 
-        {/* =========================================
-            SUMMARY CARDS
-        ========================================= */}
+        {/* SUMMARY CARDS */}
 
         <div className="financial-summary">
-
-          {/* ΣΥΝΟΛΙΚΑ ΕΣΟΔΑ */}
 
           <div className="financial-summary-card income">
 
@@ -700,8 +823,6 @@ function Dashboard() {
           </div>
 
 
-          {/* ΥΠΟΛΟΙΠΑ */}
-
           <div className="financial-summary-card balance">
 
             <div className="financial-summary-icon">
@@ -731,8 +852,6 @@ function Dashboard() {
           </div>
 
 
-          {/* ΠΩΛΗΤΕΣ ΜΕ ΥΠΟΛΟΙΠΟ */}
-
           <div className="financial-summary-card vendors-balance">
 
             <div className="financial-summary-icon">
@@ -756,9 +875,7 @@ function Dashboard() {
         </div>
 
 
-        {/* =========================================
-            ΓΡΑΦΗΜΑ ΑΝΑ ΠΑΝΗΓΥΡΙ
-        ========================================= */}
+        {/* ΓΡΑΦΗΜΑ ΑΝΑ ΠΑΝΗΓΥΡΙ */}
 
         <div className="financial-chart-card">
 
@@ -773,7 +890,6 @@ function Dashboard() {
             </span>
 
           </div>
-
 
           <div className="financial-chart">
 
@@ -814,15 +930,15 @@ function Dashboard() {
 
                     </div>
 
-
                     <div className="chart-bar-background">
 
                       <div
                         className="chart-bar"
                         style={{
-                          width: showFinancials
-                            ? `${percentage}%`
-                            : "100%",
+                          width:
+                            showFinancials
+                              ? `${percentage}%`
+                              : "100%",
                         }}
                       />
 
@@ -838,9 +954,7 @@ function Dashboard() {
         </div>
 
 
-        {/* =========================================
-            ΥΠΟΛΟΙΠΑ ΑΝΑ ΠΑΝΗΓΥΡΙ
-        ========================================= */}
+        {/* ΥΠΟΛΟΙΠΑ ΑΝΑ ΠΑΝΗΓΥΡΙ */}
 
         <div className="balances-card">
 
@@ -855,7 +969,6 @@ function Dashboard() {
             </span>
 
           </div>
-
 
           <div className="balances-list">
 
@@ -882,7 +995,6 @@ function Dashboard() {
 
                   </div>
 
-
                   <strong
                     className={
                       !showFinancials
@@ -899,6 +1011,313 @@ function Dashboard() {
 
               )
             )}
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      {/* =========================================
+          💡 SMART INSIGHTS
+      ========================================= */}
+
+      <div className="smart-insights-section">
+
+        <div className="smart-insights-header">
+
+          <div>
+
+            <h2>
+              💡 Smart Insights
+            </h2>
+
+            <p>
+              Αυτόματη ανάλυση των δεδομένων για το{" "}
+              {selectedYear}
+            </p>
+
+          </div>
+
+          <div className="smart-insights-badge">
+            ✨ Smart
+          </div>
+
+        </div>
+
+
+        <div className="smart-insights-grid">
+
+          {/* =====================================
+              TOP FESTIVAL
+          ===================================== */}
+
+          <div className="smart-insight-card top">
+
+            <div className="smart-insight-icon">
+              🏆
+            </div>
+
+            <div className="smart-insight-content">
+
+              <span className="smart-insight-label">
+                Καλύτερο Πανηγύρι
+              </span>
+
+              {topFestival ? (
+                <>
+                  <h3>
+                    {topFestival.festival.name}
+                  </h3>
+
+                  <p>
+                    Έχει τα υψηλότερα έσοδα
+                    με{" "}
+                    <strong
+                      className={
+                        !showFinancials
+                          ? "financial-blurred"
+                          : ""
+                      }
+                    >
+                      {formatMoney(
+                        topFestival.total
+                      )}€
+                    </strong>
+                  </p>
+                </>
+              ) : (
+                <p>
+                  Δεν υπάρχουν δεδομένα.
+                </p>
+              )}
+
+            </div>
+
+          </div>
+
+
+          {/* =====================================
+              COLLECTION RATE
+          ===================================== */}
+
+          <div className="smart-insight-card success">
+
+            <div className="smart-insight-icon">
+              📈
+            </div>
+
+            <div className="smart-insight-content">
+
+              <span className="smart-insight-label">
+                Ποσοστό Είσπραξης
+              </span>
+
+              <h3>
+                {collectionPercentage.toFixed(
+                  1
+                )}%
+              </h3>
+
+              <div className="smart-progress">
+
+                <div
+                  className="smart-progress-bar"
+                  style={{
+                    width: `${Math.min(
+                      collectionPercentage,
+                      100
+                    )}%`,
+                  }}
+                />
+
+              </div>
+
+              <p>
+                Από το συνολικό ποσό
+              </p>
+
+            </div>
+
+          </div>
+
+
+          {/* =====================================
+              BALANCES
+          ===================================== */}
+
+          <div
+            className={`smart-insight-card ${
+              balanceStatus.type
+            }`}
+          >
+
+            <div className="smart-insight-icon">
+              {balanceStatus.icon}
+            </div>
+
+            <div className="smart-insight-content">
+
+              <span className="smart-insight-label">
+                Οικονομική Κατάσταση
+              </span>
+
+              <h3>
+                {balanceStatus.title}
+              </h3>
+
+              <p>
+                {balanceStatus.text}
+              </p>
+
+            </div>
+
+          </div>
+
+
+          {/* =====================================
+              MOST POPULAR FESTIVAL
+          ===================================== */}
+
+          <div className="smart-insight-card popular">
+
+            <div className="smart-insight-icon">
+              👥
+            </div>
+
+            <div className="smart-insight-content">
+
+              <span className="smart-insight-label">
+                Δημοφιλέστερο Πανηγύρι
+              </span>
+
+              {mostPopularFestival ? (
+                <>
+                  <h3>
+                    {
+                      mostPopularFestival
+                        .festival.name
+                    }
+                  </h3>
+
+                  <p>
+                    {
+                      mostPopularFestival.count
+                    } πωλητές συμμετέχουν
+                  </p>
+                </>
+              ) : (
+                <p>
+                  Δεν υπάρχουν δεδομένα.
+                </p>
+              )}
+
+            </div>
+
+          </div>
+
+
+          {/* =====================================
+              TOP VENDOR
+          ===================================== */}
+
+          <div className="smart-insight-card vendor">
+
+            <div className="smart-insight-icon">
+              ⭐
+            </div>
+
+            <div className="smart-insight-content">
+
+              <span className="smart-insight-label">
+                Κορυφαίος Πωλητής
+              </span>
+
+              {topVendor ? (
+                <>
+                  <h3>
+                    {
+                      topVendor.vendor
+                        .firstName
+                    }{" "}
+                    {
+                      topVendor.vendor
+                        .lastName
+                    }
+                  </h3>
+
+                  <p>
+                    Συνολικό ποσό:{" "}
+                    <strong
+                      className={
+                        !showFinancials
+                          ? "financial-blurred"
+                          : ""
+                      }
+                    >
+                      {formatMoney(
+                        topVendor.total
+                      )}€
+                    </strong>
+                  </p>
+                </>
+              ) : (
+                <p>
+                  Δεν υπάρχουν δεδομένα.
+                </p>
+              )}
+
+            </div>
+
+          </div>
+
+
+          {/* =====================================
+              ACTIVE FESTIVAL
+          ===================================== */}
+
+          <div className="smart-insight-card live">
+
+            <div className="smart-insight-icon">
+              🔥
+            </div>
+
+            <div className="smart-insight-content">
+
+              <span className="smart-insight-label">
+                Κατάσταση
+              </span>
+
+              {activeFestival ? (
+                <>
+                  <h3>
+                    🟢 LIVE
+                  </h3>
+
+                  <p>
+                    {activeFestival.name}
+                    {" — "}
+                    {
+                      activeFestivalParticipants
+                    }{" "}
+                    συμμετέχοντες
+                  </p>
+                </>
+              ) : (
+                <>
+                  <h3>
+                    🟡 Αναμονή
+                  </h3>
+
+                  <p>
+                    Δεν υπάρχει ενεργό
+                    πανηγύρι αυτή τη στιγμή.
+                  </p>
+                </>
+              )}
+
+            </div>
 
           </div>
 
