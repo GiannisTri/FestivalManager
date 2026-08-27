@@ -447,27 +447,37 @@ function Dashboard() {
   // =========================================
 
   const balanceStatus =
-    vendorsWithBalance > 0
-      ? {
-          type: "warning",
-          icon: "⚠️",
-          title:
-            "Υπάρχουν εκκρεμή υπόλοιπα",
-          text:
-            `${vendorsWithBalance} πωλητές έχουν ` +
-            `συνολικό υπόλοιπο ${formatMoney(
-              totalTaxes
-            )}€`,
-        }
-      : {
-          type: "success",
-          icon: "🎉",
-          title:
-            "Όλα τακτοποιημένα",
-          text:
-            `Δεν υπάρχουν εκκρεμή υπόλοιπα ` +
-            `για το ${selectedYear}.`,
-        };
+  vendorsWithBalance > 0
+    ? {
+        type: "warning",
+        icon: "⚠️",
+        title: "Υπάρχουν εκκρεμή υπόλοιπα",
+
+        text: (
+          <>
+            {vendorsWithBalance} πωλητές έχουν συνολικό
+            υπόλοιπο{" "}
+            <strong
+              className={
+                !showFinancials
+                  ? "financial-blurred"
+                  : ""
+              }
+            >
+              {formatMoney(totalTaxes)}€
+            </strong>
+          </>
+        ),
+      }
+    : {
+        type: "success",
+        icon: "🎉",
+        title: "Όλα τακτοποιημένα",
+
+        text:
+          `Δεν υπάρχουν εκκρεμή υπόλοιπα ` +
+          `για το ${selectedYear}.`,
+      };
 
   // =========================================
   // 🔔 AUTOMATIC ALERTS
