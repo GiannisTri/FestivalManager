@@ -854,17 +854,32 @@ function Dashboard() {
   // ΣΤΟΙΧΕΙΑ SELECTED FESTIVAL
   // =========================================
 
-  const getFestivalDetails = (
-    festival
-  ) => {
+ const getFestivalDetails = (
+  festival
+) => {
 
-    const festivalPayments =
-      payments.filter(
-        (payment) =>
-          payment.festivalId ===
-          festival.id
+ 
+  const calendarRegistrationIds =
+    registrations
+      .filter(
+        (registration) =>
+          Number(registration.year) ===
+          Number(calendarYear)
+      )
+      .map(
+        (registration) =>
+          registration.id
       );
 
+  const festivalPayments =
+    payments.filter(
+      (payment) =>
+        payment.festivalId ===
+          festival.id &&
+        calendarRegistrationIds.includes(
+          payment.registrationId
+        )
+    );
     const participantIds =
       new Set(
         festivalPayments
