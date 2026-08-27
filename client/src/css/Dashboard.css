@@ -2513,3 +2513,110 @@
   }
 
 }
+/* =========================================================
+   📱 MOBILE CALENDAR FIX
+========================================================= */
+
+@media (max-width: 600px) {
+
+  /* Το section δεν ξεχειλώνει */
+  .festival-calendar-section {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  /* Wrapper χωρίς οριζόντιο scroll */
+  .calendar-wrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  /* 7 ίσες στήλες */
+  .calendar-weekdays {
+    width: 100%;
+    min-width: 0;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+
+  .calendar-grid {
+    width: 100%;
+    min-width: 0;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+
+  /* Κελιά ημερολογίου */
+  .calendar-day {
+    min-width: 0;
+    min-height: 82px;
+    padding: 5px;
+    box-sizing: border-box;
+  }
+
+  /* Αριθμός ημέρας */
+  .calendar-day-number {
+    width: 26px;
+    height: 26px;
+    margin-bottom: 4px;
+    font-size: 12px;
+  }
+
+  /* Events */
+  .calendar-events {
+    gap: 3px;
+    min-width: 0;
+  }
+
+  .calendar-event {
+    width: 100%;
+    min-width: 0;
+    padding: 4px 3px;
+    gap: 2px;
+    border-radius: 6px;
+    font-size: 8px;
+    line-height: 1.15;
+    box-sizing: border-box;
+  }
+
+  .calendar-event-name {
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  /* Κρύβουμε το icon στα πολύ μικρά cells */
+  .calendar-event-icon {
+    display: none;
+  }
+
+  /* Ημέρες εβδομάδας */
+  .calendar-weekday {
+    padding: 9px 2px;
+    font-size: 10px;
+    overflow: hidden;
+  }
+
+  /* Navigation μήνα */
+  .calendar-month-navigation {
+    width: 100%;
+    gap: 8px;
+    box-sizing: border-box;
+  }
+
+  .calendar-month-title {
+    min-width: 0;
+    flex: 1;
+    font-size: 18px;
+  }
+
+  .calendar-nav-btn {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+  }
+
+}
