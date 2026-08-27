@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import * as XLSX from "xlsx";
 
 import vendorsService from "../services/vendorsService";
 import registrationsService from "../services/registrationsService";
@@ -334,7 +335,9 @@ function Dashboard() {
   // =========================================
 
   const formatMoney = (value) => {
-    return Number(value || 0).toLocaleString(
+    return Number(
+      value || 0
+    ).toLocaleString(
       "el-GR",
       {
         minimumFractionDigits: 2,
@@ -376,7 +379,6 @@ function Dashboard() {
   const festivalParticipants =
     festivals.map(
       (festival) => {
-
         const participantIds =
           new Set(
             payments
@@ -389,7 +391,6 @@ function Dashboard() {
                   )
               )
               .map((payment) => {
-
                 const registration =
                   registrations.find(
                     (r) =>
@@ -398,7 +399,6 @@ function Dashboard() {
                   );
 
                 return registration?.vendorId;
-
               })
               .filter(Boolean)
           );
@@ -426,7 +426,6 @@ function Dashboard() {
   const vendorTotals =
     vendors.map(
       (vendor) => {
-
         const vendorRegistrationIds =
           registrations
             .filter(
@@ -527,6 +526,7 @@ function Dashboard() {
       icon: "⚠️",
       title:
         "Υπάρχουν εκκρεμή υπόλοιπα",
+
       text:
         `${vendorsWithBalance} πωλητές έχουν ` +
         `υπόλοιπο προς είσπραξη.`,
@@ -539,6 +539,7 @@ function Dashboard() {
       icon: "🟢",
       title:
         "Ενεργό πανηγύρι",
+
       text:
         `${activeFestival.name} βρίσκεται ` +
         `αυτή τη στιγμή σε εξέλιξη.`,
@@ -546,7 +547,6 @@ function Dashboard() {
   }
 
   if (upcomingFestival) {
-
     const start =
       new Date(
         upcomingFestival.startDate
@@ -568,6 +568,7 @@ function Dashboard() {
         icon: "🚨",
         title:
           "Το επόμενο πανηγύρι πλησιάζει",
+
         text:
           `${upcomingFestival.name} ξεκινά ` +
           `σε ${daysLeft} ${
@@ -588,6 +589,7 @@ function Dashboard() {
       icon: "💰",
       title:
         "Καλύτερη επίδοση",
+
       text:
         `${topFestival.festival.name} έχει ` +
         `τα υψηλότερα έσοδα για το ` +
@@ -603,11 +605,155 @@ function Dashboard() {
       icon: "🎉",
       title:
         "Όλα υπό έλεγχο",
+
       text:
         `Δεν υπάρχουν σημαντικές ` +
         `εκκρεμότητες για το ${selectedYear}.`,
     });
   }
+
+  // =========================================
+  // 📊 EXPORT EXCEL
+  // =========================================
+
+  const exportVendorsToExcel = () => {
+    try {
+      const vendorsForYear = vendors
+        .map((vendor) => {
+          const vendorRegistrations =
+            registrations.filter(
+              (registration) =>
+                registration.vendorId ===
+                  vendor.id &&
+                Number(
+                  registration.year
+                ) === Number(selectedYear)
+            );
+
+          // Όλα τα registration IDs του πωλητή
+          const registrationIds =
+            vendorRegistrations.map(
+              (registration) =>
+                registration.id
+            );
+
+          // Payments του πωλητή για το συγκεκριμένο έτος
+          const vendorPayments =
+            payments.filter(
+              (payment) =>
+                registrationIds.includes(
+                  payment.registrationId
+                )
+            );
+
+          // IDs πανηγυριών χωρίς διπλότυπα
+          const festivalIds = [
+            ...new Set(
+              vendorPayments.map(
+                (payment) =>
+                  payment.festivalId
+              )
+            ),
+          ];
+
+          // Ονόματα πανηγυριών
+          const festivalNames =
+            festivalIds
+              .map((festivalId) => {
+                const festival =
+                  festivals.find(
+                    (f) =>
+                      f.id ===
+                      festivalId
+                  );
+
+                return festival?.name;
+              })
+              .filter(Boolean);
+
+          return {
+            Όνομα:
+              vendor.firstName || "",
+
+            Επώνυμο:
+              vendor.lastName || "",
+
+            Τηλέφωνο:
+              vendor.phone || "",
+
+            Email:
+              vendor.email || "",
+
+            "Πανηγύρια":
+              festivalNames.join(", "),
+          };
+        })
+        // Κρατάμε μόνο πωλητές που έχουν συμμετοχή
+        // στο επιλεγμένο έτος
+        .filter(
+          (vendor) =>
+            vendor["Πανηγύρια"] !== ""
+        );
+
+      if (vendorsForYear.length === 0) {
+        alert(
+          `Δεν υπάρχουν πωλητές με συμμετοχές για το ${selectedYear}.`
+        );
+
+        return;
+      }
+
+      // Δημιουργία worksheet
+      const worksheet =
+        XLSX.utils.json_to_sheet(
+          vendorsForYear
+        );
+
+      // Πλάτος στηλών
+      worksheet["!cols"] = [
+        {
+          wch: 20,
+        },
+        {
+          wch: 25,
+        },
+        {
+          wch: 18,
+        },
+        {
+          wch: 30,
+        },
+        {
+          wch: 60,
+        },
+      ];
+
+      // Δημιουργία workbook
+      const workbook =
+        XLSX.utils.book_new();
+
+      XLSX.utils.book_append_sheet(
+        workbook,
+        worksheet,
+        `Πωλητές ${selectedYear}`
+      );
+
+      // Όνομα αρχείου
+      XLSX.writeFile(
+        workbook,
+        `Πωλητές_${selectedYear}.xlsx`
+      );
+    } catch (error) {
+      console.error(
+        "Excel export error:",
+        error
+      );
+
+      alert(
+        "Παρουσιάστηκε σφάλμα κατά την εξαγωγή του Excel."
+      );
+    }
+  };
 
   // =========================================
   // 📅 FESTIVAL CALENDAR
@@ -658,8 +804,6 @@ function Dashboard() {
       0
     );
 
-  // JS: Κυριακή = 0
-  // Θέλουμε Δευτέρα = 0
   const firstWeekDay =
     (firstDay.getDay() + 6) % 7;
 
@@ -696,7 +840,6 @@ function Dashboard() {
 
   const festivalsForCalendar =
     festivals.filter((festival) => {
-
       const start =
         new Date(
           festival.startDate
@@ -713,15 +856,15 @@ function Dashboard() {
         end.getFullYear() ===
           calendarYear
       );
-
     });
 
   // =========================================
   // ΒΡΕΣ ΠΑΝΗΓΥΡΙ ΓΙΑ ΗΜΕΡΑ
   // =========================================
 
-  const getFestivalsForDay = (day) => {
-
+  const getFestivalsForDay = (
+    day
+  ) => {
     if (!day) {
       return [];
     }
@@ -742,7 +885,6 @@ function Dashboard() {
 
     return festivalsForCalendar.filter(
       (festival) => {
-
         const start =
           new Date(
             festival.startDate
@@ -771,10 +913,8 @@ function Dashboard() {
           date >= start &&
           date <= end
         );
-
       }
     );
-
   };
 
   // =========================================
@@ -784,16 +924,18 @@ function Dashboard() {
   const getFestivalStatus = (
     festival
   ) => {
-
     if (
-      today >= festival.startDate &&
-      today <= festival.endDate
+      today >=
+        festival.startDate &&
+      today <=
+        festival.endDate
     ) {
       return "active";
     }
 
     if (
-      festival.startDate > today
+      festival.startDate >
+      today
     ) {
       return "upcoming";
     }
@@ -808,7 +950,6 @@ function Dashboard() {
   const changeCalendarMonth = (
     direction
   ) => {
-
     setCalendarDate(
       (prev) =>
         new Date(
@@ -818,11 +959,9 @@ function Dashboard() {
           1
         )
     );
-
   };
 
   const goToToday = () => {
-
     const current =
       new Date();
 
@@ -833,13 +972,11 @@ function Dashboard() {
         1
       )
     );
-
   };
 
   const changeCalendarYear = (
     year
   ) => {
-
     setCalendarDate(
       new Date(
         Number(year),
@@ -847,44 +984,43 @@ function Dashboard() {
         1
       )
     );
-
   };
 
   // =========================================
   // ΣΤΟΙΧΕΙΑ SELECTED FESTIVAL
   // =========================================
 
- const getFestivalDetails = (
-  festival
-) => {
+  const getFestivalDetails = (
+    festival
+  ) => {
+    const calendarRegistrationIds =
+      registrations
+        .filter(
+          (registration) =>
+            Number(
+              registration.year
+            ) ===
+            Number(calendarYear)
+        )
+        .map(
+          (registration) =>
+            registration.id
+        );
 
- 
-  const calendarRegistrationIds =
-    registrations
-      .filter(
-        (registration) =>
-          Number(registration.year) ===
-          Number(calendarYear)
-      )
-      .map(
-        (registration) =>
-          registration.id
+    const festivalPayments =
+      payments.filter(
+        (payment) =>
+          payment.festivalId ===
+            festival.id &&
+          calendarRegistrationIds.includes(
+            payment.registrationId
+          )
       );
 
-  const festivalPayments =
-    payments.filter(
-      (payment) =>
-        payment.festivalId ===
-          festival.id &&
-        calendarRegistrationIds.includes(
-          payment.registrationId
-        )
-    );
     const participantIds =
       new Set(
         festivalPayments
           .map((payment) => {
-
             const registration =
               registrations.find(
                 (r) =>
@@ -893,7 +1029,6 @@ function Dashboard() {
               );
 
             return registration?.vendorId;
-
           })
           .filter(Boolean)
       );
@@ -960,7 +1095,6 @@ function Dashboard() {
 
       progress,
     };
-
   };
 
   // =========================================
@@ -974,7 +1108,6 @@ function Dashboard() {
         Dashboard
       </h1>
 
-
       {/* =========================================
           BASIC STATISTICS
       ========================================= */}
@@ -982,7 +1115,6 @@ function Dashboard() {
       <div className="stats-grid">
 
         <div className="stat-card">
-
           <div className="icon">
             👥
           </div>
@@ -994,12 +1126,9 @@ function Dashboard() {
           <p>
             Συνολικοί Πωλητές
           </p>
-
         </div>
 
-
         <div className="stat-card">
-
           <div className="icon">
             📝
           </div>
@@ -1013,12 +1142,9 @@ function Dashboard() {
           <p>
             Εγγραφές {selectedYear}
           </p>
-
         </div>
 
-
         <div className="stat-card">
-
           <div className="icon">
             🎪
           </div>
@@ -1030,11 +1156,83 @@ function Dashboard() {
           <p>
             Πανηγύρια
           </p>
-
         </div>
 
       </div>
 
+      {/* =========================================
+          EXPORT EXCEL
+      ========================================= */}
+
+      <div className="excel-export-section">
+
+        <div className="excel-export-content">
+
+          <div>
+            <h2>
+              📊 Εξαγωγή Πωλητών
+            </h2>
+
+            <p>
+              Εξαγωγή των πωλητών και των
+              πανηγυριών τους για το
+              επιλεγμένο έτος.
+            </p>
+          </div>
+
+          <div className="excel-export-actions">
+
+            <div className="year-selector">
+
+              <label htmlFor="excel-year">
+                Έτος:
+              </label>
+
+              <select
+                id="excel-year"
+                value={selectedYear}
+                onChange={(e) =>
+                  setSelectedYear(
+                    Number(
+                      e.target.value
+                    )
+                  )
+                }
+              >
+                <option value="2025">
+                  2025
+                </option>
+
+                <option value="2026">
+                  2026
+                </option>
+
+                <option value="2027">
+                  2027
+                </option>
+
+                <option value="2028">
+                  2028
+                </option>
+              </select>
+
+            </div>
+
+            <button
+              type="button"
+              className="excel-export-btn"
+              onClick={
+                exportVendorsToExcel
+              }
+            >
+              📥 Εξαγωγή Excel
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
 
       {/* =========================================
           ACTIVE / NEXT FESTIVAL
@@ -1086,7 +1284,6 @@ function Dashboard() {
 
         </div>
 
-
         <div className="festival-card">
 
           <h2>
@@ -1115,7 +1312,6 @@ function Dashboard() {
         </div>
 
       </div>
-
 
       {/* =========================================
           ΣΥΝΟΛΑ ΠΑΝΗΓΥΡΙΩΝ
@@ -1146,7 +1342,6 @@ function Dashboard() {
                 )
               }
             >
-
               <option value="2025">
                 2025
               </option>
@@ -1162,13 +1357,11 @@ function Dashboard() {
               <option value="2028">
                 2028
               </option>
-
             </select>
 
           </div>
 
         </div>
-
 
         <div className="festival-totals-grid">
 
@@ -1219,9 +1412,7 @@ function Dashboard() {
                     {selectedYear}
                   </p>
 
-
                   {countdown ? (
-
                     <div className="festival-countdown">
 
                       <span>
@@ -1229,56 +1420,44 @@ function Dashboard() {
                       </span>
 
                       <strong>
-
                         {countdown.days}η{" "}
-
                         {String(
                           countdown.hours
                         ).padStart(
                           2,
                           "0"
                         )}
-
                         :
-
                         {String(
                           countdown.minutes
                         ).padStart(
                           2,
                           "0"
                         )}
-
                         :
-
                         {String(
                           countdown.seconds
                         ).padStart(
                           2,
                           "0"
                         )}
-
                       </strong>
 
                     </div>
-
                   ) : (
-
                     <div className="festival-countdown started">
                       🟢 Σε εξέλιξη
                     </div>
-
                   )}
 
                 </div>
               );
-
             }
           )}
 
         </div>
 
       </div>
-
 
       {/* =========================================
           ΟΙΚΟΝΟΜΙΚΗ ΕΙΚΟΝΑ
@@ -1317,7 +1496,6 @@ function Dashboard() {
 
         </div>
 
-
         <div className="financial-summary">
 
           <div className="financial-summary-card income">
@@ -1348,7 +1526,6 @@ function Dashboard() {
 
           </div>
 
-
           <div className="financial-summary-card balance">
 
             <div className="financial-summary-icon">
@@ -1377,7 +1554,6 @@ function Dashboard() {
 
           </div>
 
-
           <div className="financial-summary-card vendors-balance">
 
             <div className="financial-summary-icon">
@@ -1400,7 +1576,6 @@ function Dashboard() {
 
         </div>
 
-
         <div className="financial-chart-card">
 
           <div className="financial-chart-header">
@@ -1414,7 +1589,6 @@ function Dashboard() {
             </span>
 
           </div>
-
 
           <div className="financial-chart">
 
@@ -1430,7 +1604,6 @@ function Dashboard() {
                   100;
 
                 return (
-
                   <div
                     key={festival.id}
                     className="chart-row"
@@ -1456,7 +1629,6 @@ function Dashboard() {
 
                     </div>
 
-
                     <div className="chart-bar-background">
 
                       <div
@@ -1472,16 +1644,13 @@ function Dashboard() {
                     </div>
 
                   </div>
-
                 );
-
               }
             )}
 
           </div>
 
         </div>
-
 
         <div className="balances-card">
 
@@ -1496,7 +1665,6 @@ function Dashboard() {
             </span>
 
           </div>
-
 
           <div className="balances-list">
 
@@ -1523,7 +1691,6 @@ function Dashboard() {
 
                   </div>
 
-
                   <strong
                     className={
                       !showFinancials
@@ -1547,9 +1714,8 @@ function Dashboard() {
 
       </div>
 
-
       {/* =========================================
-          💡 SMART INSIGHTS
+          SMART INSIGHTS
       ========================================= */}
 
       <div className="smart-insights-section">
@@ -1563,8 +1729,9 @@ function Dashboard() {
             </h2>
 
             <p>
-              Αυτόματη ανάλυση των δεδομένων
-              για το {selectedYear}
+              Αυτόματη ανάλυση των
+              δεδομένων για το{" "}
+              {selectedYear}
             </p>
 
           </div>
@@ -1574,7 +1741,6 @@ function Dashboard() {
           </div>
 
         </div>
-
 
         <div className="smart-insights-grid">
 
@@ -1594,13 +1760,16 @@ function Dashboard() {
                 <>
                   <h3>
                     {
-                      topFestival.festival.name
+                      topFestival
+                        .festival
+                        .name
                     }
                   </h3>
 
                   <p>
-                    Έχει τα υψηλότερα έσοδα
-                    με{" "}
+                    Έχει τα υψηλότερα
+                    έσοδα με{" "}
+
                     <strong
                       className={
                         !showFinancials
@@ -1623,7 +1792,6 @@ function Dashboard() {
             </div>
 
           </div>
-
 
           <div className="smart-insight-card success">
 
@@ -1665,7 +1833,6 @@ function Dashboard() {
 
           </div>
 
-
           <div
             className={
               `smart-insight-card ${
@@ -1696,7 +1863,6 @@ function Dashboard() {
 
           </div>
 
-
           <div className="smart-insight-card popular">
 
             <div className="smart-insight-icon">
@@ -1722,7 +1888,8 @@ function Dashboard() {
                   <p>
                     {
                       mostPopularFestival.count
-                    } πωλητές συμμετέχουν
+                    }{" "}
+                    πωλητές συμμετέχουν
                   </p>
                 </>
               ) : (
@@ -1734,7 +1901,6 @@ function Dashboard() {
             </div>
 
           </div>
-
 
           <div className="smart-insight-card vendor">
 
@@ -1763,6 +1929,7 @@ function Dashboard() {
 
                   <p>
                     Συνολικό ποσό:{" "}
+
                     <strong
                       className={
                         !showFinancials
@@ -1785,7 +1952,6 @@ function Dashboard() {
             </div>
 
           </div>
-
 
           <div className="smart-insight-card live">
 
@@ -1822,7 +1988,8 @@ function Dashboard() {
 
                   <p>
                     Δεν υπάρχει ενεργό
-                    πανηγύρι αυτή τη στιγμή.
+                    πανηγύρι αυτή τη
+                    στιγμή.
                   </p>
                 </>
               )}
@@ -1835,9 +2002,8 @@ function Dashboard() {
 
       </div>
 
-
       {/* =========================================
-          📅 FESTIVAL CALENDAR CENTER
+          📅 FESTIVAL CALENDAR
       ========================================= */}
 
       <div className="festival-calendar-section">
@@ -1859,7 +2025,8 @@ function Dashboard() {
                 </h2>
 
                 <p>
-                  Όλα τα πανηγύρια σε ένα ημερολόγιο
+                  Όλα τα πανηγύρια σε ένα
+                  ημερολόγιο
                 </p>
 
               </div>
@@ -1868,13 +2035,14 @@ function Dashboard() {
 
           </div>
 
-
           <div className="calendar-controls">
 
             <button
               type="button"
               className="calendar-today-btn"
-              onClick={goToToday}
+              onClick={
+                goToToday
+              }
             >
               Σήμερα
             </button>
@@ -1887,7 +2055,6 @@ function Dashboard() {
                 )
               }
             >
-
               <option value="2025">
                 2025
               </option>
@@ -1903,15 +2070,11 @@ function Dashboard() {
               <option value="2028">
                 2028
               </option>
-
             </select>
 
           </div>
 
         </div>
-
-
-        {/* MONTH NAVIGATION */}
 
         <div className="calendar-month-navigation">
 
@@ -1925,11 +2088,14 @@ function Dashboard() {
             ‹
           </button>
 
-
           <div className="calendar-month-title">
 
             <span>
-              {monthNames[calendarMonth]}
+              {
+                monthNames[
+                  calendarMonth
+                ]
+              }
             </span>
 
             <strong>
@@ -1937,7 +2103,6 @@ function Dashboard() {
             </strong>
 
           </div>
-
 
           <button
             type="button"
@@ -1951,28 +2116,22 @@ function Dashboard() {
 
         </div>
 
-
-        {/* CALENDAR */}
-
         <div className="calendar-wrapper">
 
           <div className="calendar-weekdays">
 
             {weekDays.map(
               (day) => (
-
                 <div
                   key={day}
                   className="calendar-weekday"
                 >
                   {day}
                 </div>
-
               )
             )}
 
           </div>
-
 
           <div className="calendar-grid">
 
@@ -1994,7 +2153,6 @@ function Dashboard() {
                     new Date().getDate();
 
                 return (
-
                   <div
                     key={index}
                     className={
@@ -2007,7 +2165,8 @@ function Dashboard() {
                           ? "today"
                           : ""
                       } ${
-                        dayFestivals.length > 0
+                        dayFestivals.length >
+                        0
                           ? "has-festival"
                           : ""
                       }`
@@ -2016,11 +2175,9 @@ function Dashboard() {
 
                     {day && (
                       <>
-
                         <div className="calendar-day-number">
                           {day}
                         </div>
-
 
                         <div className="calendar-events">
 
@@ -2033,9 +2190,10 @@ function Dashboard() {
                                 );
 
                               return (
-
                                 <button
-                                  key={festival.id}
+                                  key={
+                                    festival.id
+                                  }
                                   type="button"
                                   className={
                                     `calendar-event ${status}`
@@ -2052,13 +2210,13 @@ function Dashboard() {
                                   </span>
 
                                   <span className="calendar-event-name">
-                                    {festival.name}
+                                    {
+                                      festival.name
+                                    }
                                   </span>
 
                                 </button>
-
                               );
-
                             }
                           )}
 
@@ -2068,18 +2226,13 @@ function Dashboard() {
                     )}
 
                   </div>
-
                 );
-
               }
             )}
 
           </div>
 
         </div>
-
-
-        {/* LEGEND */}
 
         <div className="calendar-legend">
 
@@ -2105,252 +2258,230 @@ function Dashboard() {
 
         </div>
 
+        {selectedFestival &&
+          (() => {
 
-        {/* =========================================
-            SELECTED FESTIVAL
-        ========================================= */}
+            const details =
+              getFestivalDetails(
+                selectedFestival
+              );
 
-        {selectedFestival && (() => {
+            const status =
+              getFestivalStatus(
+                selectedFestival
+              );
 
-          const details =
-            getFestivalDetails(
-              selectedFestival
+            const countdown =
+              getCountdown(
+                selectedFestival.startDate
+              );
+
+            return (
+              <div className="calendar-festival-details">
+
+                <button
+                  type="button"
+                  className="calendar-close-btn"
+                  onClick={() =>
+                    setSelectedFestival(
+                      null
+                    )
+                  }
+                >
+                  ×
+                </button>
+
+                <div className="calendar-details-top">
+
+                  <div className="calendar-details-icon">
+                    🎪
+                  </div>
+
+                  <div>
+
+                    <span
+                      className={
+                        `calendar-status-badge ${status}`
+                      }
+                    >
+                      {status ===
+                      "active"
+                        ? "🟢 Σε εξέλιξη"
+                        : status ===
+                          "upcoming"
+                        ? "🔵 Επερχόμενο"
+                        : "⚪ Ολοκληρωμένο"}
+                    </span>
+
+                    <h3>
+                      {
+                        selectedFestival.name
+                      }
+                    </h3>
+
+                  </div>
+
+                </div>
+
+                <div className="calendar-details-date">
+
+                  📅{" "}
+                  {
+                    selectedFestival.startDate
+                  }
+                  {" — "}
+                  {
+                    selectedFestival.endDate
+                  }
+
+                </div>
+
+                <div className="calendar-details-stats">
+
+                  <div>
+
+                    <span>
+                      👥
+                    </span>
+
+                    <strong>
+                      {
+                        details.participants
+                      }
+                    </strong>
+
+                    <small>
+                      Πωλητές
+                    </small>
+
+                  </div>
+
+                  <div>
+
+                    <span>
+                      💰
+                    </span>
+
+                    <strong
+                      className={
+                        !showFinancials
+                          ? "financial-blurred"
+                          : ""
+                      }
+                    >
+                      {formatMoney(
+                        details.amount
+                      )}€
+                    </strong>
+
+                    <small>
+                      Έσοδα
+                    </small>
+
+                  </div>
+
+                  <div>
+
+                    <span>
+                      💳
+                    </span>
+
+                    <strong
+                      className={
+                        !showFinancials
+                          ? "financial-blurred"
+                          : ""
+                      }
+                    >
+                      {formatMoney(
+                        details.taxes
+                      )}€
+                    </strong>
+
+                    <small>
+                      Υπόλοιπο
+                    </small>
+
+                  </div>
+
+                </div>
+
+                <div className="calendar-progress-section">
+
+                  <div className="calendar-progress-header">
+
+                    <span>
+                      Πορεία πανηγυριού
+                    </span>
+
+                    <strong>
+                      {Math.round(
+                        details.progress
+                      )}%
+                    </strong>
+
+                  </div>
+
+                  <div className="calendar-progress-background">
+
+                    <div
+                      className={
+                        `calendar-progress-bar ${status}`
+                      }
+                      style={{
+                        width:
+                          `${details.progress}%`,
+                      }}
+                    />
+
+                  </div>
+
+                </div>
+
+                {countdown ? (
+                  <div className="calendar-countdown">
+
+                    <span>
+                      ⏳ Έναρξη σε
+                    </span>
+
+                    <strong>
+                      {countdown.days}η{" "}
+                      {String(
+                        countdown.hours
+                      ).padStart(
+                        2,
+                        "0"
+                      )}
+                      :
+                      {String(
+                        countdown.minutes
+                      ).padStart(
+                        2,
+                        "0"
+                      )}
+                      :
+                      {String(
+                        countdown.seconds
+                      ).padStart(
+                        2,
+                        "0"
+                      )}
+                    </strong>
+
+                  </div>
+                ) : status ===
+                  "active" ? (
+                  <div className="calendar-countdown active">
+                    🟢 Το πανηγύρι βρίσκεται σε εξέλιξη
+                  </div>
+                ) : null}
+
+              </div>
             );
-
-          const status =
-            getFestivalStatus(
-              selectedFestival
-            );
-
-          const countdown =
-            getCountdown(
-              selectedFestival.startDate
-            );
-
-          return (
-
-            <div className="calendar-festival-details">
-
-              <button
-                type="button"
-                className="calendar-close-btn"
-                onClick={() =>
-                  setSelectedFestival(
-                    null
-                  )
-                }
-              >
-                ×
-              </button>
-
-
-              <div className="calendar-details-top">
-
-                <div className="calendar-details-icon">
-                  🎪
-                </div>
-
-                <div>
-
-                  <span
-                    className={
-                      `calendar-status-badge ${status}`
-                    }
-                  >
-                    {status === "active"
-                      ? "🟢 Σε εξέλιξη"
-                      : status === "upcoming"
-                      ? "🔵 Επερχόμενο"
-                      : "⚪ Ολοκληρωμένο"}
-                  </span>
-
-                  <h3>
-                    {selectedFestival.name}
-                  </h3>
-
-                </div>
-
-              </div>
-
-
-              <div className="calendar-details-date">
-
-                📅{" "}
-                {selectedFestival.startDate}
-                {" — "}
-                {selectedFestival.endDate}
-
-              </div>
-
-
-              <div className="calendar-details-stats">
-
-                <div>
-
-                  <span>
-                    👥
-                  </span>
-
-                  <strong>
-                    {details.participants}
-                  </strong>
-
-                  <small>
-                    Πωλητές
-                  </small>
-
-                </div>
-
-
-                <div>
-
-                  <span>
-                    💰
-                  </span>
-
-                  <strong
-                    className={
-                      !showFinancials
-                        ? "financial-blurred"
-                        : ""
-                    }
-                  >
-                    {formatMoney(
-                      details.amount
-                    )}€
-                  </strong>
-
-                  <small>
-                    Έσοδα
-                  </small>
-
-                </div>
-
-
-                <div>
-
-                  <span>
-                    💳
-                  </span>
-
-                  <strong
-                    className={
-                      !showFinancials
-                        ? "financial-blurred"
-                        : ""
-                    }
-                  >
-                    {formatMoney(
-                      details.taxes
-                    )}€
-                  </strong>
-
-                  <small>
-                    Υπόλοιπο
-                  </small>
-
-                </div>
-
-              </div>
-
-
-              {/* PROGRESS */}
-
-              <div className="calendar-progress-section">
-
-                <div className="calendar-progress-header">
-
-                  <span>
-                    Πορεία πανηγυριού
-                  </span>
-
-                  <strong>
-                    {Math.round(
-                      details.progress
-                    )}%
-                  </strong>
-
-                </div>
-
-
-                <div className="calendar-progress-background">
-
-                  <div
-                    className={
-                      `calendar-progress-bar ${status}`
-                    }
-                    style={{
-                      width:
-                        `${details.progress}%`,
-                    }}
-                  />
-
-                </div>
-
-              </div>
-
-
-              {/* COUNTDOWN */}
-
-              {countdown ? (
-
-                <div className="calendar-countdown">
-
-                  <span>
-                    ⏳ Έναρξη σε
-                  </span>
-
-                  <strong>
-
-                    {countdown.days}η{" "}
-
-                    {String(
-                      countdown.hours
-                    ).padStart(
-                      2,
-                      "0"
-                    )}
-
-                    :
-
-                    {String(
-                      countdown.minutes
-                    ).padStart(
-                      2,
-                      "0"
-                    )}
-
-                    :
-
-                    {String(
-                      countdown.seconds
-                    ).padStart(
-                      2,
-                      "0"
-                    )}
-
-                  </strong>
-
-                </div>
-
-              ) : status === "active" ? (
-
-                <div className="calendar-countdown active">
-
-                  🟢 Το πανηγύρι βρίσκεται σε εξέλιξη
-
-                </div>
-
-              ) : null}
-
-            </div>
-
-          );
-
-        })()}
+          })()}
 
       </div>
-
 
       {/* =========================================
           🔔 AUTOMATIC ALERTS
@@ -2378,7 +2509,6 @@ function Dashboard() {
           </div>
 
         </div>
-
 
         <div className="automatic-alerts-grid">
 
