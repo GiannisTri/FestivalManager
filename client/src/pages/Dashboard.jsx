@@ -20,9 +20,25 @@ function Dashboard() {
 
   const [now, setNow] = useState(new Date());
 
-  // Εμφάνιση / απόκρυψη οικονομικών
+  // Απόκρυψη / εμφάνιση οικονομικών
   const [showFinancials, setShowFinancials] =
     useState(true);
+
+  // =========================================
+  // 📅 CALENDAR STATE
+  // =========================================
+
+  const [calendarDate, setCalendarDate] =
+    useState(
+      new Date(
+        currentYear,
+        new Date().getMonth(),
+        1
+      )
+    );
+
+  const [selectedFestival, setSelectedFestival] =
+    useState(null);
 
   // =========================================
   // ΦΟΡΤΩΣΗ ΔΕΔΟΜΕΝΩΝ
@@ -56,7 +72,7 @@ function Dashboard() {
   }, []);
 
   // =========================================
-  // LIVE COUNTDOWN
+  // LIVE CLOCK / COUNTDOWN
   // =========================================
 
   useEffect(() => {
@@ -121,14 +137,28 @@ function Dashboard() {
 
   const activeFestivalParticipants =
     activeFestival
-      ? payments.filter(
-          (payment) =>
-            payment.festivalId ===
-              activeFestival.id &&
-            registrationIdsForSelectedYear.includes(
-              payment.registrationId
+      ? new Set(
+          payments
+            .filter(
+              (payment) =>
+                payment.festivalId ===
+                  activeFestival.id &&
+                registrationIdsForSelectedYear.includes(
+                  payment.registrationId
+                )
             )
-        ).length
+            .map((payment) => {
+              const registration =
+                registrations.find(
+                  (r) =>
+                    r.id ===
+                    payment.registrationId
+                );
+
+              return registration?.vendorId;
+            })
+            .filter(Boolean)
+        ).size
       : 0;
 
   // =========================================
@@ -153,7 +183,7 @@ function Dashboard() {
   };
 
   // =========================================
-  // ΣΥΝΟΛΙΚΑ TAXES ΑΝΑ ΠΑΝΗΓΥΡΙ
+  // ΣΥΝΟΛΙΚΑ TAXES
   // =========================================
 
   const getFestivalTaxes = (festivalId) => {
@@ -250,13 +280,13 @@ function Dashboard() {
     const hours =
       Math.floor(
         (totalSeconds % 86400) /
-        3600
+          3600
       );
 
     const minutes =
       Math.floor(
         (totalSeconds % 3600) /
-        60
+          60
       );
 
     const seconds =
@@ -271,7 +301,7 @@ function Dashboard() {
   };
 
   // =========================================
-  // ΣΤΟΙΧΕΙΑ ΟΙΚΟΝΟΜΙΚΗΣ ΕΙΚΟΝΑΣ
+  // ΟΙΚΟΝΟΜΙΚΑ
   // =========================================
 
   const festivalTotals =
@@ -300,11 +330,11 @@ function Dashboard() {
     );
 
   // =========================================
-  // FORMAT ΧΡΗΜΑΤΩΝ
+  // FORMAT MONEY
   // =========================================
 
   const formatMoney = (value) => {
-    return value.toLocaleString(
+    return Number(value || 0).toLocaleString(
       "el-GR",
       {
         minimumFractionDigits: 2,
@@ -322,30 +352,31 @@ function Dashboard() {
 
   const collectionPercentage =
     totalPossible > 0
-      ? (totalAmount / totalPossible) *
+      ? (totalAmount /
+          totalPossible) *
         100
       : 0;
 
   // =========================================
-  // ΚΑΛΥΤΕΡΟ ΠΑΝΗΓΥΡΙ ΣΕ ΕΣΟΔΑ
+  // ΚΑΛΥΤΕΡΟ ΠΑΝΗΓΥΡΙ
   // =========================================
 
   const topFestival =
     festivalTotals.length > 0
-      ? [...festivalTotals]
-          .sort(
-            (a, b) =>
-              b.total - a.total
-          )[0]
+      ? [...festivalTotals].sort(
+          (a, b) =>
+            b.total - a.total
+        )[0]
       : null;
 
   // =========================================
-  // ΠΑΝΗΓΥΡΙ ΜΕ ΠΕΡΙΣΣΟΤΕΡΟΥΣ ΠΩΛΗΤΕΣ
+  // ΔΗΜΟΦΙΛΕΣΤΕΡΟ ΠΑΝΗΓΥΡΙ
   // =========================================
 
   const festivalParticipants =
     festivals.map(
       (festival) => {
+
         const participantIds =
           new Set(
             payments
@@ -358,6 +389,7 @@ function Dashboard() {
                   )
               )
               .map((payment) => {
+
                 const registration =
                   registrations.find(
                     (r) =>
@@ -366,6 +398,7 @@ function Dashboard() {
                   );
 
                 return registration?.vendorId;
+
               })
               .filter(Boolean)
           );
@@ -380,15 +413,14 @@ function Dashboard() {
 
   const mostPopularFestival =
     festivalParticipants.length > 0
-      ? [...festivalParticipants]
-          .sort(
-            (a, b) =>
-              b.count - a.count
-          )[0]
+      ? [...festivalParticipants].sort(
+          (a, b) =>
+            b.count - a.count
+        )[0]
       : null;
 
   // =========================================
-  // ΠΩΛΗΤΗΣ ΜΕ ΤΑ ΠΕΡΙΣΣΟΤΕΡΑ ΕΣΟΔΑ
+  // ΚΟΡΥΦΑΙΟΣ ΠΩΛΗΤΗΣ
   // =========================================
 
   const vendorTotals =
@@ -435,11 +467,10 @@ function Dashboard() {
 
   const topVendor =
     vendorTotals.length > 0
-      ? [...vendorTotals]
-          .sort(
-            (a, b) =>
-              b.total - a.total
-          )[0]
+      ? [...vendorTotals].sort(
+          (a, b) =>
+            b.total - a.total
+        )[0]
       : null;
 
   // =========================================
@@ -447,47 +478,48 @@ function Dashboard() {
   // =========================================
 
   const balanceStatus =
-  vendorsWithBalance > 0
-    ? {
-        type: "warning",
-        icon: "⚠️",
-        title: "Υπάρχουν εκκρεμή υπόλοιπα",
+    vendorsWithBalance > 0
+      ? {
+          type: "warning",
+          icon: "⚠️",
+          title:
+            "Υπάρχουν εκκρεμή υπόλοιπα",
 
-        text: (
-          <>
-            {vendorsWithBalance} πωλητές έχουν συνολικό
-            υπόλοιπο{" "}
-            <strong
-              className={
-                !showFinancials
-                  ? "financial-blurred"
-                  : ""
-              }
-            >
-              {formatMoney(totalTaxes)}€
-            </strong>
-          </>
-        ),
-      }
-    : {
-        type: "success",
-        icon: "🎉",
-        title: "Όλα τακτοποιημένα",
+          text: (
+            <>
+              {vendorsWithBalance} πωλητές έχουν
+              συνολικό υπόλοιπο{" "}
 
-        text:
-          `Δεν υπάρχουν εκκρεμή υπόλοιπα ` +
-          `για το ${selectedYear}.`,
-      };
+              <strong
+                className={
+                  !showFinancials
+                    ? "financial-blurred"
+                    : ""
+                }
+              >
+                {formatMoney(
+                  totalTaxes
+                )}€
+              </strong>
+            </>
+          ),
+        }
+      : {
+          type: "success",
+          icon: "🎉",
+          title:
+            "Όλα τακτοποιημένα",
+
+          text:
+            `Δεν υπάρχουν εκκρεμή υπόλοιπα ` +
+            `για το ${selectedYear}.`,
+        };
 
   // =========================================
   // 🔔 AUTOMATIC ALERTS
   // =========================================
 
   const automaticAlerts = [];
-
-  // -----------------------------------------
-  // ΥΠΟΛΟΙΠΑ
-  // -----------------------------------------
 
   if (vendorsWithBalance > 0) {
     automaticAlerts.push({
@@ -501,10 +533,6 @@ function Dashboard() {
     });
   }
 
-  // -----------------------------------------
-  // ΕΝΕΡΓΟ ΠΑΝΗΓΥΡΙ
-  // -----------------------------------------
-
   if (activeFestival) {
     automaticAlerts.push({
       type: "success",
@@ -517,10 +545,6 @@ function Dashboard() {
     });
   }
 
-  // -----------------------------------------
-  // ΕΠΟΜΕΝΟ ΠΑΝΗΓΥΡΙ
-  // -----------------------------------------
-
   if (upcomingFestival) {
 
     const start =
@@ -528,12 +552,9 @@ function Dashboard() {
         upcomingFestival.startDate
       );
 
-    const todayDate =
-      new Date();
-
     const difference =
       start.getTime() -
-      todayDate.getTime();
+      new Date().getTime();
 
     const daysLeft =
       Math.ceil(
@@ -542,7 +563,6 @@ function Dashboard() {
       );
 
     if (daysLeft <= 7) {
-
       automaticAlerts.push({
         type: "danger",
         icon: "🚨",
@@ -556,13 +576,8 @@ function Dashboard() {
               : "ημέρες"
           }.`,
       });
-
     }
   }
-
-  // -----------------------------------------
-  // ΚΑΛΥΤΕΡΟ ΠΑΝΗΓΥΡΙ
-  // -----------------------------------------
 
   if (
     topFestival &&
@@ -580,10 +595,6 @@ function Dashboard() {
     });
   }
 
-  // -----------------------------------------
-  // ΚΑΝΕΝΑ ALERT
-  // -----------------------------------------
-
   if (
     automaticAlerts.length === 0
   ) {
@@ -598,12 +609,356 @@ function Dashboard() {
     });
   }
 
+  // =========================================
+  // 📅 FESTIVAL CALENDAR
+  // =========================================
+
+  const calendarYear =
+    calendarDate.getFullYear();
+
+  const calendarMonth =
+    calendarDate.getMonth();
+
+  const monthNames = [
+    "Ιανουάριος",
+    "Φεβρουάριος",
+    "Μάρτιος",
+    "Απρίλιος",
+    "Μάιος",
+    "Ιούνιος",
+    "Ιούλιος",
+    "Αύγουστος",
+    "Σεπτέμβριος",
+    "Οκτώβριος",
+    "Νοέμβριος",
+    "Δεκέμβριος",
+  ];
+
+  const weekDays = [
+    "Δε",
+    "Τρ",
+    "Τε",
+    "Πε",
+    "Πα",
+    "Σα",
+    "Κυ",
+  ];
+
+  const firstDay =
+    new Date(
+      calendarYear,
+      calendarMonth,
+      1
+    );
+
+  const lastDay =
+    new Date(
+      calendarYear,
+      calendarMonth + 1,
+      0
+    );
+
+  // JS: Κυριακή = 0
+  // Θέλουμε Δευτέρα = 0
+  const firstWeekDay =
+    (firstDay.getDay() + 6) % 7;
+
+  const daysInMonth =
+    lastDay.getDate();
+
+  const calendarCells = [];
+
+  for (
+    let i = 0;
+    i < firstWeekDay;
+    i++
+  ) {
+    calendarCells.push(null);
+  }
+
+  for (
+    let day = 1;
+    day <= daysInMonth;
+    day++
+  ) {
+    calendarCells.push(day);
+  }
+
+  while (
+    calendarCells.length % 7 !== 0
+  ) {
+    calendarCells.push(null);
+  }
+
+  // =========================================
+  // FESTIVALS ΤΟΥ ΗΜΕΡΟΛΟΓΙΟΥ
+  // =========================================
+
+  const festivalsForCalendar =
+    festivals.filter((festival) => {
+
+      const start =
+        new Date(
+          festival.startDate
+        );
+
+      const end =
+        new Date(
+          festival.endDate
+        );
+
+      return (
+        start.getFullYear() ===
+          calendarYear ||
+        end.getFullYear() ===
+          calendarYear
+      );
+
+    });
+
+  // =========================================
+  // ΒΡΕΣ ΠΑΝΗΓΥΡΙ ΓΙΑ ΗΜΕΡΑ
+  // =========================================
+
+  const getFestivalsForDay = (day) => {
+
+    if (!day) {
+      return [];
+    }
+
+    const date =
+      new Date(
+        calendarYear,
+        calendarMonth,
+        day
+      );
+
+    date.setHours(
+      12,
+      0,
+      0,
+      0
+    );
+
+    return festivalsForCalendar.filter(
+      (festival) => {
+
+        const start =
+          new Date(
+            festival.startDate
+          );
+
+        const end =
+          new Date(
+            festival.endDate
+          );
+
+        start.setHours(
+          0,
+          0,
+          0,
+          0
+        );
+
+        end.setHours(
+          23,
+          59,
+          59,
+          999
+        );
+
+        return (
+          date >= start &&
+          date <= end
+        );
+
+      }
+    );
+
+  };
+
+  // =========================================
+  // ΚΑΤΑΣΤΑΣΗ ΠΑΝΗΓΥΡΙΟΥ
+  // =========================================
+
+  const getFestivalStatus = (
+    festival
+  ) => {
+
+    if (
+      today >= festival.startDate &&
+      today <= festival.endDate
+    ) {
+      return "active";
+    }
+
+    if (
+      festival.startDate > today
+    ) {
+      return "upcoming";
+    }
+
+    return "past";
+  };
+
+  // =========================================
+  // CALENDAR NAVIGATION
+  // =========================================
+
+  const changeCalendarMonth = (
+    direction
+  ) => {
+
+    setCalendarDate(
+      (prev) =>
+        new Date(
+          prev.getFullYear(),
+          prev.getMonth() +
+            direction,
+          1
+        )
+    );
+
+  };
+
+  const goToToday = () => {
+
+    const current =
+      new Date();
+
+    setCalendarDate(
+      new Date(
+        current.getFullYear(),
+        current.getMonth(),
+        1
+      )
+    );
+
+  };
+
+  const changeCalendarYear = (
+    year
+  ) => {
+
+    setCalendarDate(
+      new Date(
+        Number(year),
+        calendarMonth,
+        1
+      )
+    );
+
+  };
+
+  // =========================================
+  // ΣΤΟΙΧΕΙΑ SELECTED FESTIVAL
+  // =========================================
+
+  const getFestivalDetails = (
+    festival
+  ) => {
+
+    const festivalPayments =
+      payments.filter(
+        (payment) =>
+          payment.festivalId ===
+          festival.id
+      );
+
+    const participantIds =
+      new Set(
+        festivalPayments
+          .map((payment) => {
+
+            const registration =
+              registrations.find(
+                (r) =>
+                  r.id ===
+                  payment.registrationId
+              );
+
+            return registration?.vendorId;
+
+          })
+          .filter(Boolean)
+      );
+
+    const amount =
+      festivalPayments.reduce(
+        (sum, payment) =>
+          sum +
+          Number(
+            payment.amount || 0
+          ),
+        0
+      );
+
+    const taxes =
+      festivalPayments.reduce(
+        (sum, payment) =>
+          sum +
+          Number(
+            payment.taxes || 0
+          ),
+        0
+      );
+
+    const start =
+      new Date(
+        festival.startDate
+      );
+
+    const end =
+      new Date(
+        festival.endDate
+      );
+
+    const totalDuration =
+      Math.max(
+        1,
+        end.getTime() -
+          start.getTime()
+      );
+
+    const elapsed =
+      now.getTime() -
+      start.getTime();
+
+    const progress =
+      Math.max(
+        0,
+        Math.min(
+          100,
+          (elapsed /
+            totalDuration) *
+            100
+        )
+      );
+
+    return {
+      participants:
+        participantIds.size,
+
+      amount,
+
+      taxes,
+
+      progress,
+    };
+
+  };
+
+  // =========================================
+  // RETURN
+  // =========================================
+
   return (
     <div className="dashboard">
 
       <h1>
         Dashboard
       </h1>
+
 
       {/* =========================================
           BASIC STATISTICS
@@ -939,16 +1294,6 @@ function Dashboard() {
                 (prev) => !prev
               )
             }
-            aria-label={
-              showFinancials
-                ? "Απόκρυψη οικονομικών στοιχείων"
-                : "Εμφάνιση οικονομικών στοιχείων"
-            }
-            title={
-              showFinancials
-                ? "Απόκρυψη ποσών"
-                : "Εμφάνιση ποσών"
-            }
           >
             {showFinancials
               ? "🔒"
@@ -957,8 +1302,6 @@ function Dashboard() {
 
         </div>
 
-
-        {/* SUMMARY CARDS */}
 
         <div className="financial-summary">
 
@@ -1043,8 +1386,6 @@ function Dashboard() {
         </div>
 
 
-        {/* ΓΡΑΦΗΜΑ ΑΝΑ ΠΑΝΗΓΥΡΙ */}
-
         <div className="financial-chart-card">
 
           <div className="financial-chart-header">
@@ -1126,8 +1467,6 @@ function Dashboard() {
 
         </div>
 
-
-        {/* ΥΠΟΛΟΙΠΑ ΑΝΑ ΠΑΝΗΓΥΡΙ */}
 
         <div className="balances-card">
 
@@ -1224,8 +1563,6 @@ function Dashboard() {
 
         <div className="smart-insights-grid">
 
-          {/* TOP FESTIVAL */}
-
           <div className="smart-insight-card top">
 
             <div className="smart-insight-icon">
@@ -1242,9 +1579,7 @@ function Dashboard() {
                 <>
                   <h3>
                     {
-                      topFestival
-                        .festival
-                        .name
+                      topFestival.festival.name
                     }
                   </h3>
 
@@ -1274,8 +1609,6 @@ function Dashboard() {
 
           </div>
 
-
-          {/* COLLECTION RATE */}
 
           <div className="smart-insight-card success">
 
@@ -1318,8 +1651,6 @@ function Dashboard() {
           </div>
 
 
-          {/* BALANCES */}
-
           <div
             className={
               `smart-insight-card ${
@@ -1350,8 +1681,6 @@ function Dashboard() {
 
           </div>
 
-
-          {/* MOST POPULAR FESTIVAL */}
 
           <div className="smart-insight-card popular">
 
@@ -1391,8 +1720,6 @@ function Dashboard() {
 
           </div>
 
-
-          {/* TOP VENDOR */}
 
           <div className="smart-insight-card vendor">
 
@@ -1445,8 +1772,6 @@ function Dashboard() {
           </div>
 
 
-          {/* ACTIVE FESTIVAL */}
-
           <div className="smart-insight-card live">
 
             <div className="smart-insight-icon">
@@ -1492,6 +1817,522 @@ function Dashboard() {
           </div>
 
         </div>
+
+      </div>
+
+
+      {/* =========================================
+          📅 FESTIVAL CALENDAR CENTER
+      ========================================= */}
+
+      <div className="festival-calendar-section">
+
+        <div className="festival-calendar-header">
+
+          <div>
+
+            <div className="calendar-title-row">
+
+              <div className="calendar-main-icon">
+                📅
+              </div>
+
+              <div>
+
+                <h2>
+                  Festival Calendar
+                </h2>
+
+                <p>
+                  Όλα τα πανηγύρια σε ένα ημερολόγιο
+                </p>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <div className="calendar-controls">
+
+            <button
+              type="button"
+              className="calendar-today-btn"
+              onClick={goToToday}
+            >
+              Σήμερα
+            </button>
+
+            <select
+              value={calendarYear}
+              onChange={(e) =>
+                changeCalendarYear(
+                  e.target.value
+                )
+              }
+            >
+
+              <option value="2025">
+                2025
+              </option>
+
+              <option value="2026">
+                2026
+              </option>
+
+              <option value="2027">
+                2027
+              </option>
+
+              <option value="2028">
+                2028
+              </option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+
+        {/* MONTH NAVIGATION */}
+
+        <div className="calendar-month-navigation">
+
+          <button
+            type="button"
+            onClick={() =>
+              changeCalendarMonth(-1)
+            }
+            className="calendar-nav-btn"
+          >
+            ‹
+          </button>
+
+
+          <div className="calendar-month-title">
+
+            <span>
+              {monthNames[calendarMonth]}
+            </span>
+
+            <strong>
+              {calendarYear}
+            </strong>
+
+          </div>
+
+
+          <button
+            type="button"
+            onClick={() =>
+              changeCalendarMonth(1)
+            }
+            className="calendar-nav-btn"
+          >
+            ›
+          </button>
+
+        </div>
+
+
+        {/* CALENDAR */}
+
+        <div className="calendar-wrapper">
+
+          <div className="calendar-weekdays">
+
+            {weekDays.map(
+              (day) => (
+
+                <div
+                  key={day}
+                  className="calendar-weekday"
+                >
+                  {day}
+                </div>
+
+              )
+            )}
+
+          </div>
+
+
+          <div className="calendar-grid">
+
+            {calendarCells.map(
+              (day, index) => {
+
+                const dayFestivals =
+                  getFestivalsForDay(
+                    day
+                  );
+
+                const dateIsToday =
+                  day &&
+                  calendarYear ===
+                    new Date().getFullYear() &&
+                  calendarMonth ===
+                    new Date().getMonth() &&
+                  day ===
+                    new Date().getDate();
+
+                return (
+
+                  <div
+                    key={index}
+                    className={
+                      `calendar-day ${
+                        !day
+                          ? "empty"
+                          : ""
+                      } ${
+                        dateIsToday
+                          ? "today"
+                          : ""
+                      } ${
+                        dayFestivals.length > 0
+                          ? "has-festival"
+                          : ""
+                      }`
+                    }
+                  >
+
+                    {day && (
+                      <>
+
+                        <div className="calendar-day-number">
+                          {day}
+                        </div>
+
+
+                        <div className="calendar-events">
+
+                          {dayFestivals.map(
+                            (festival) => {
+
+                              const status =
+                                getFestivalStatus(
+                                  festival
+                                );
+
+                              return (
+
+                                <button
+                                  key={festival.id}
+                                  type="button"
+                                  className={
+                                    `calendar-event ${status}`
+                                  }
+                                  onClick={() =>
+                                    setSelectedFestival(
+                                      festival
+                                    )
+                                  }
+                                >
+
+                                  <span className="calendar-event-icon">
+                                    🎪
+                                  </span>
+
+                                  <span className="calendar-event-name">
+                                    {festival.name}
+                                  </span>
+
+                                </button>
+
+                              );
+
+                            }
+                          )}
+
+                        </div>
+
+                      </>
+                    )}
+
+                  </div>
+
+                );
+
+              }
+            )}
+
+          </div>
+
+        </div>
+
+
+        {/* LEGEND */}
+
+        <div className="calendar-legend">
+
+          <div>
+            <span className="legend-dot active" />
+            Ενεργό
+          </div>
+
+          <div>
+            <span className="legend-dot upcoming" />
+            Επερχόμενο
+          </div>
+
+          <div>
+            <span className="legend-dot past" />
+            Ολοκληρωμένο
+          </div>
+
+          <div>
+            <span className="legend-dot today" />
+            Σήμερα
+          </div>
+
+        </div>
+
+
+        {/* =========================================
+            SELECTED FESTIVAL
+        ========================================= */}
+
+        {selectedFestival && (() => {
+
+          const details =
+            getFestivalDetails(
+              selectedFestival
+            );
+
+          const status =
+            getFestivalStatus(
+              selectedFestival
+            );
+
+          const countdown =
+            getCountdown(
+              selectedFestival.startDate
+            );
+
+          return (
+
+            <div className="calendar-festival-details">
+
+              <button
+                type="button"
+                className="calendar-close-btn"
+                onClick={() =>
+                  setSelectedFestival(
+                    null
+                  )
+                }
+              >
+                ×
+              </button>
+
+
+              <div className="calendar-details-top">
+
+                <div className="calendar-details-icon">
+                  🎪
+                </div>
+
+                <div>
+
+                  <span
+                    className={
+                      `calendar-status-badge ${status}`
+                    }
+                  >
+                    {status === "active"
+                      ? "🟢 Σε εξέλιξη"
+                      : status === "upcoming"
+                      ? "🔵 Επερχόμενο"
+                      : "⚪ Ολοκληρωμένο"}
+                  </span>
+
+                  <h3>
+                    {selectedFestival.name}
+                  </h3>
+
+                </div>
+
+              </div>
+
+
+              <div className="calendar-details-date">
+
+                📅{" "}
+                {selectedFestival.startDate}
+                {" — "}
+                {selectedFestival.endDate}
+
+              </div>
+
+
+              <div className="calendar-details-stats">
+
+                <div>
+
+                  <span>
+                    👥
+                  </span>
+
+                  <strong>
+                    {details.participants}
+                  </strong>
+
+                  <small>
+                    Πωλητές
+                  </small>
+
+                </div>
+
+
+                <div>
+
+                  <span>
+                    💰
+                  </span>
+
+                  <strong
+                    className={
+                      !showFinancials
+                        ? "financial-blurred"
+                        : ""
+                    }
+                  >
+                    {formatMoney(
+                      details.amount
+                    )}€
+                  </strong>
+
+                  <small>
+                    Έσοδα
+                  </small>
+
+                </div>
+
+
+                <div>
+
+                  <span>
+                    💳
+                  </span>
+
+                  <strong
+                    className={
+                      !showFinancials
+                        ? "financial-blurred"
+                        : ""
+                    }
+                  >
+                    {formatMoney(
+                      details.taxes
+                    )}€
+                  </strong>
+
+                  <small>
+                    Υπόλοιπο
+                  </small>
+
+                </div>
+
+              </div>
+
+
+              {/* PROGRESS */}
+
+              <div className="calendar-progress-section">
+
+                <div className="calendar-progress-header">
+
+                  <span>
+                    Πορεία πανηγυριού
+                  </span>
+
+                  <strong>
+                    {Math.round(
+                      details.progress
+                    )}%
+                  </strong>
+
+                </div>
+
+
+                <div className="calendar-progress-background">
+
+                  <div
+                    className={
+                      `calendar-progress-bar ${status}`
+                    }
+                    style={{
+                      width:
+                        `${details.progress}%`,
+                    }}
+                  />
+
+                </div>
+
+              </div>
+
+
+              {/* COUNTDOWN */}
+
+              {countdown ? (
+
+                <div className="calendar-countdown">
+
+                  <span>
+                    ⏳ Έναρξη σε
+                  </span>
+
+                  <strong>
+
+                    {countdown.days}η{" "}
+
+                    {String(
+                      countdown.hours
+                    ).padStart(
+                      2,
+                      "0"
+                    )}
+
+                    :
+
+                    {String(
+                      countdown.minutes
+                    ).padStart(
+                      2,
+                      "0"
+                    )}
+
+                    :
+
+                    {String(
+                      countdown.seconds
+                    ).padStart(
+                      2,
+                      "0"
+                    )}
+
+                  </strong>
+
+                </div>
+
+              ) : status === "active" ? (
+
+                <div className="calendar-countdown active">
+
+                  🟢 Το πανηγύρι βρίσκεται σε εξέλιξη
+
+                </div>
+
+              ) : null}
+
+            </div>
+
+          );
+
+        })()}
 
       </div>
 
