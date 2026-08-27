@@ -2620,3 +2620,125 @@
   }
 
 }
+
+/* =========================================
+   EXCEL EXPORT
+========================================= */
+
+.excel-export-section {
+  margin: 30px 0;
+  background: white;
+  border-radius: 18px;
+  padding: 25px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.excel-export-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+}
+
+.excel-export-content h2 {
+  margin: 0 0 8px;
+  color: #1e293b;
+}
+
+.excel-export-content p {
+  margin: 0;
+  color: #64748b;
+}
+
+.excel-export-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.excel-export-btn {
+  border: none;
+  border-radius: 12px;
+  padding: 12px 20px;
+  background: #16a34a;
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+  white-space: nowrap;
+}
+
+.excel-export-btn:hover {
+  background: #15803d;
+  transform: translateY(-2px);
+}
+
+.excel-export-btn:active {
+  transform: translateY(0);
+}
+
+.excel-export-actions .year-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.excel-export-actions .year-selector label {
+  font-weight: 600;
+  color: #475569;
+}
+
+.excel-export-actions .year-selector select {
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: white;
+  color: #1e293b;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 768px) {
+
+  .excel-export-section {
+    padding: 20px;
+  }
+
+  .excel-export-content {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .excel-export-content h2 {
+    font-size: 20px;
+  }
+
+  .excel-export-content p {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .excel-export-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .excel-export-actions .year-selector {
+    justify-content: space-between;
+  }
+
+  .excel-export-actions .year-selector select {
+    flex: 1;
+  }
+
+  .excel-export-btn {
+    width: 100%;
+    padding: 14px;
+    font-size: 16px;
+  }
+}
